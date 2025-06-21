@@ -18,14 +18,14 @@ export function MapDisplay() {
         const neighborhood = neighborhoods[0]
         console.log(neighborhood)
         const ring = neighborhood.the_geom.coordinates[0][0];
-        const maxY = Math.max(...ring.map((coord) => coord.y));
+        const maxY = Math.max(...ring.map((coord) => coord.long));
         console.log(maxY)
         return (
             <svg width={1920} height={1080}>
                 {
                     neighborhoods.map((neighborhood, i) =>
                         <polygon key={i} points={neighborhood.the_geom.coordinates[0][0].map((coord) =>
-                            `${latLngToSvgPixel(coord.y, coord.x, bbox, svgSize).x * scale - offset}, ${latLngToSvgPixel(coord.y, coord.x, bbox, svgSize).y * scale - offset}`
+                            `${latLngToSvgPixel(coord.lat, coord.long, bbox, svgSize).x * scale - offset}, ${latLngToSvgPixel(coord.lat, coord.long, bbox, svgSize).y * scale - offset}`
                         ).join(" ")} stroke="black" fill="lightblue" >
                             <title>{neighborhood.ntaname}</title>
                         </polygon>

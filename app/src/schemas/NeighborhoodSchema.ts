@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const CoordinateSchema = z.tuple([z.number(), z.number()]).transform(([x, y]) => ({ x, y }))
+const CoordinateSchema = z.tuple([z.number(), z.number()]).transform(([x, y]) => ({ long: x, lat: y }))
 
 
 
