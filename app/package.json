@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mapbox/sphericalmercator": "^2.0.1",
+    "npm": "^11.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "zod": "^3.25.67"
