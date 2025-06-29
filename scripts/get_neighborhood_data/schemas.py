@@ -33,4 +33,4 @@ class NeighborhoodSchema(BaseSchema):
     
     @post_load
     def make_neighborhood(self, data, **kwargs):
-        return Neighborhood(**data)
+        return Neighborhood(**data, polygons=[])

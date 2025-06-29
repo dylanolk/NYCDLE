@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 @dataclass
 class Coordinate:
     lat: int
@@ -15,4 +14,4 @@ class Neighborhood:
     name: str 
     boroname: str
     geometry: Geometry
-    polygons: list[str]
+    polygons: list[list[float]]

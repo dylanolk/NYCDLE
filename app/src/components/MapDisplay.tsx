@@ -1,45 +1,51 @@
 import { useEffect, useState } from "react";
 import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
-import { SphericalMercator } from '@mapbox/sphericalmercator';
 
 export function MapDisplay() {
     const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
 
-    useEffect(() => { fetchData(setNeighborhoods); }, []);
- 
-    let polygons = []
+    useEffect(() => {
+        fetchData(setNeighborhoods);
+    }, []);
 
-    if(neighborhoods === null) return;
-
-    for (let i = 0; i < neighborhoods.length; i++){
-        polygons= polygons.concat(
-            neighborhoods[i].polygons.map(
-                (polygon_points, j) => {
-                    (<polygon key={`${i}-${j}`} points={polygon_points}/>)
-                }
-            )
-        )
+    if (!neighborhoods || neighborhoods.length === 0) {
+        return <div>Loading...</div>;
     }
 
-    console.log(polygons)
+    const polygons = neighborhoods.flatMap((n, i) =>
+        n.polygons.map((polygon: any[], j: number) => {
+            console.log(polygon)
+            const polygon_points = polygon.map(
+                (pair) => pair.join(',')
+            ).join(" ")
+           return (
+            <polygon key={`${i}-${j}`} points={polygon_points} fill="lightblue" stroke="black">
+                <title> {n.name}</title>
+            </polygon>
+           )
+})
+    );
 
     return (
-       <svg>
-        {polygons}
-       </svg>
-    );
+        <svg width="4000" height= "4000">
+            <polygon points = "50,40 40,50" fill="lightblue" stroke="black"/>
+            {polygons}
+        </svg>
+    )
 }
 
-
-
-
 async function fetchData(setNeighborhoods: (neighborhoods: any) => void) {
-    const response = await fetch('/coords.json')
+    const response = await fetch('/coords.json');
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json()
+    const data = await response.json();
 
-    const neighborhoods = NeighborhoodListSchema.safeParse(data).data
-    setNeighborhoods(neighborhoods)
+    const result = NeighborhoodListSchema.safeParse(data);
+    if (!result.success) {
+        console.error("Schema validation failed", result.error);
+        return;
+    }
+
+    setNeighborhoods(result.data);
 }

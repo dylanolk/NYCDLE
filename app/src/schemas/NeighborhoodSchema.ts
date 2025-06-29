@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-const CoordinateSchema = z.tuple([z.number(), z.number()]).transform(([x, y]) => ({ long: x, lat: y }))
+const CoordinateSchema = z.object({
+    lat: z.number(),
+    lon: z.number()
+})
 
 const GeomSchema = z.object({
     type: z.string(),
@@ -8,10 +11,10 @@ const GeomSchema = z.object({
 })
 
 const NeighborhoodSchema = z.object({
-    ntaname: z.string(),
+    name: z.string(),
     boroname: z.string(),
-    the_geom: GeomSchema, 
-    polygons: z.array(z.string())
+    geometry: GeomSchema, 
+    polygons: z.array(z.array(z.array((z.number()))))
 });
 
 

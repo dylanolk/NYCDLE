@@ -1,32 +1,94 @@
 from schemas import NeighborhoodSchema
 from domain import Neighborhood
 from requests import get
-from math import tan, pi, log
+from math import tan, pi, log, radians
+from dataclasses import asdict
 import json
 
 data = get('https://data.cityofnewyork.us/resource/9nt8-h7nd.json')
 
 neighborhoods:list[Neighborhood]=NeighborhoodSchema().load(data.json(), many=True)
 
-def mercator(lat, lon, height=600, width=600):
-    x = (lon+180)*(width/360)
-    lat_radians = (lat*pi)/180
-    mercN = log(tan((pi/4)+(lat_radians/2)))
-    y = (height/2) - (width*mercN/(2*pi))
+def mercator(lon, lat):
+    """
+    Convert latitude and longitude to Web Mercator (EPSG:3857) coordinates.
+    
+    Parameters:
+        lat (float): Latitude in degrees.
+        lon (float): Longitude in degrees.
+    
+    Returns:
+        (float, float): Tuple containing x and y in meters.
+    """
+    RADIUS = 6378137  # Earth's radius in meters (WGS84)
+    
+    x = RADIUS * radians(lon)
+    y = RADIUS * log(tan(pi / 4 + radians(lat) / 2))
+    
+    return x, y
 
-    return x,y
+def flatten_coords(coords): 
+    polygons = []
+    for group in coords:
+        for polygon in group:
+            polygons.append(polygon)
+    return polygons
 
-def polygon_mercator(polygon):
-    return [mercator(coordinate.lat, coordinate.lon) for coordinate in polygon]
+def populate_polygons(neighborhood: Neighborhood):
+    polygons = flatten_coords(neighborhood.geometry.coordinates)
+    projected_polygons = []
+    for polygon in polygons:
+        projected_polygons.append(
+                [
+                    mercator(coord.lat, coord.lon)
+                    for coord in polygon
+                ]
+            )
+    neighborhood.polygons = projected_polygons
+    return neighborhood
 
-def polygons_mercator(polygons):
-    return [polygon_mercator(polygon) for polygon in polygons]
+def project_polygons_to_screen(neighborhoods:list[Neighborhood], width, height, padding=0):
+    all_coords = [coord for neighborhood in neighborhoods for polygon in neighborhood.polygons for coord in polygon]
 
-def coords_mercator(coords):
-    return [polygons_mercator(polygons) for polygons in coords]
+    xs, ys = zip(*all_coords)
+
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+
+    x_range = max_x - min_x
+    y_range = max_y - min_y
+
+    pad_x = x_range * padding
+    pad_y = y_range * padding
+
+    min_x -= pad_x
+    max_x += pad_x
+    min_y -= pad_y
+    max_y += pad_y
 
 
+    scale_x = width / x_range
+    scale_y = height / y_range
+    scale = min(scale_x, scale_y)
 
 
-with open('coords.json', 'w') as file: 
-    json.dump(coords_mercator(coords), file )
+    for neighborhood in neighborhoods:
+        new_polygons = []
+        for polygon in neighborhood.polygons:
+            screen_coords = []
+            for x, y in polygon:
+                sx = (x - min_x) * scale
+                sy = height - (y - min_y) * scale
+                screen_coords.append((sx, sy))
+            new_polygons.append(screen_coords)
+        neighborhood.polygons=new_polygons
+    return neighborhoods
+
+neighborhoods = [populate_polygons(neighborhood) for neighborhood in neighborhoods]
+
+neighborhoods= project_polygons_to_screen(neighborhoods, 1920, 1080)
+
+
+with open('C:/Users/Dylan/Documents/Programming Projects/NYCDLE/app/coords.json', 'w') as file: 
+    out_neighborhoods = [asdict(neighborhood) for neighborhood in neighborhoods]
+    json.dump(out_neighborhoods, file )
