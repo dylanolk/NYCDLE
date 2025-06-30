@@ -1,3 +1,5 @@
+## Schemas to read from nyc-data api (https://data.cityofnewyork.us/resource/9nt8-h7nd.json)
+
 from marshmallow import Schema, fields, EXCLUDE, post_load
 from domain import Coordinate, Geometry, Neighborhood
 
