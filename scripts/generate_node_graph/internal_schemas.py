@@ -26,10 +26,12 @@ class GeometrySchema(BaseSchema):
 
 
 class NeighborhoodSchema(BaseSchema):
+    id = fields.Integer()
     name = fields.String()
     boroname = fields.String()
     geometry = fields.Nested(GeometrySchema)
     polygons = fields.List(fields.List(fields.List(fields.Float())))
+    borders = fields.List(fields.Integer())
 
     @post_load
     def make_neighborhood(self, data, **kwargs):

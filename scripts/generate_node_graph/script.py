@@ -14,7 +14,7 @@ for i, neighborhood in enumerate(neighborhoods):
 for neighborhood in neighborhoods:
     borders: list[int] = []
     all_coords_a = [
-        (coord.lat, coord.lon)
+        (round(coord.lat, 5), round(coord.lon, 5))
         for group in neighborhood.geometry.coordinates
         for polygon in group
         for coord in polygon
@@ -23,7 +23,7 @@ for neighborhood in neighborhoods:
         if neighborhood_b == neighborhood:
             continue
         all_coords_b = [
-            (coord.lat, coord.lon)
+            (round(coord.lat, 5), round(coord.lon, 5))
             for group in neighborhood_b.geometry.coordinates
             for polygon in group
             for coord in polygon

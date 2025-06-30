@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
+import svgPanZoom from 'svg-pan-zoom';
 
 export function MapDisplay() {
     const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
@@ -8,9 +9,17 @@ export function MapDisplay() {
         fetchData(setNeighborhoods);
     }, []);
 
-    if (!neighborhoods || neighborhoods.length === 0) {
-        return <div>Loading...</div>;
-    }
+    useEffect(() => {
+        if (!neighborhoods || neighborhoods.length === 0) return;
+
+        const panZoom = svgPanZoom('#my-svg', {
+            controlIconsEnabled: true,
+            fit: true,
+            center: true
+        });
+
+        return () => panZoom.destroy(); // cleanup
+    }, [neighborhoods]);
 
     const polygons = neighborhoods.flatMap((n, i) =>
         n.polygons.map((polygon: any[], j: number) => {
@@ -18,17 +27,20 @@ export function MapDisplay() {
             const polygon_points = polygon.map(
                 (pair) => pair.join(',')
             ).join(" ")
-           return (
-            <polygon key={`${i}-${j}`} points={polygon_points} fill="lightblue" stroke="black">
-                <title> {n.name}</title>
-            </polygon>
-           )
-})
+            return (
+                <polygon key={`${i}-${j}`} points={polygon_points} fill="lightblue" stroke="black">
+                    <title> {n.name}</title>
+                </polygon>
+            )
+        })
     );
 
+    if (!neighborhoods || neighborhoods.length === 0) {
+        return <div>Loading...</div>;
+    }
     return (
-        <svg width="4000" height= "4000">
-            <polygon points = "50,40 40,50" fill="lightblue" stroke="black"/>
+        <svg id="my-svg" width="4000" height="4000">
+            <polygon points="50,40 40,50" fill="lightblue" stroke="black" />
             {polygons}
         </svg>
     )

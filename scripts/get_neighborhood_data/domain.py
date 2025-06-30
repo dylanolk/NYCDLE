@@ -21,3 +21,4 @@ class Neighborhood:
     polygons: list[list[float]]
     borders: list[str] | None = None
     id: int | None = None
+    distances: list[int] | None = None
