@@ -2,20 +2,32 @@ import { useEffect, useState } from "react";
 import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
 import svgPanZoom from 'svg-pan-zoom';
 
-export function MapDisplay() {
-    const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
+type NeighborhoodProps = {
+    neighborhoods: [];
+};
 
-    useEffect(() => {
-        fetchData(setNeighborhoods);
-    }, []);
+
+export function MapDisplay({ neighborhoods }: NeighborhoodProps) {
+    ;
+    const styles = {
+        box: {
+            border: '2px solid #333',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            height: '80vh',
+            width: '60vw'
+        },
+    };
 
     useEffect(() => {
         if (!neighborhoods || neighborhoods.length === 0) return;
 
         const panZoom = svgPanZoom('#my-svg', {
-            controlIconsEnabled: true,
             fit: true,
-            center: true
+            center: true,
+            zoomScaleSensitivity: 1.5,
+            minZoom: .9,
         });
 
         return () => panZoom.destroy(); // cleanup
@@ -39,25 +51,12 @@ export function MapDisplay() {
         return <div>Loading...</div>;
     }
     return (
-        <svg id="my-svg" width="4000" height="4000">
-            <polygon points="50,40 40,50" fill="lightblue" stroke="black" />
-            {polygons}
-        </svg>
+        <div style={styles.box}>
+            <svg id="my-svg" viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }} >
+                <polygon points="50,40 40,50" fill="lightblue" stroke="black" />
+                {polygons}
+            </svg>
+        </div>
+
     )
-}
-
-async function fetchData(setNeighborhoods: (neighborhoods: any) => void) {
-    const response = await fetch('/coords.json');
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-
-    const result = NeighborhoodListSchema.safeParse(data);
-    if (!result.success) {
-        console.error("Schema validation failed", result.error);
-        return;
-    }
-
-    setNeighborhoods(result.data);
 }
