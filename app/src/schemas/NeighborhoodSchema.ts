@@ -11,10 +11,13 @@ const GeomSchema = z.object({
 })
 
 const NeighborhoodSchema = z.object({
+    id: z.number(),
+    borders: z.array(z.number()),
     name: z.string(),
     boroname: z.string(),
-    geometry: GeomSchema, 
-    polygons: z.array(z.array(z.array((z.number()))))
+    geometry: GeomSchema,
+    polygons: z.array(z.array(z.array((z.number())))),
+    enabled: z.boolean().default(true)
 });
 
 

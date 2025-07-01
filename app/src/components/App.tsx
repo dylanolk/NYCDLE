@@ -11,6 +11,15 @@ export function App() {
     fetchData(setNeighborhoods);
   }, []);
 
+  function enable_neighborhood(id) {
+    setNeighborhoods(prev =>
+      prev.map(n =>
+        n.id === id ? { ...n, enabled: false } : n
+      )
+    );
+  }
+
+
   const wrapper: CSSProperties = {
     height: '100vh',
     width: '100vw',
@@ -19,12 +28,15 @@ export function App() {
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
     flexDirection: 'column',
+    margin: 0,
+    padding: 0,
+    overflow: 'hidden',
   }
   return (
     // <Header /> 
     <div style={wrapper}>
       <MapDisplay neighborhoods={neighborhoods} />
-      <SearchBar neighborhoods={neighborhoods} />
+      <SearchBar neighborhoods={neighborhoods} onSubmit={enable_neighborhood} />
     </div>
   )
 
