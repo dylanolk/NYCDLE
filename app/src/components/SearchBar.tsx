@@ -37,15 +37,9 @@ export function SearchBar({ neighborhoods, onSubmit }: SearchBarProps) {
             margin: "2vh"
         }
     };
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            onSubmit(value?.value ?? null);
-            setValue(null); // Optional: clear after submit
-        }
-    };
+
     return (
-        <div onKeyDown={handleKeyDown} style={styles.box}>
+        <div style={styles.box}>
             <Select
                 options={options}
                 isClearable
@@ -54,7 +48,7 @@ export function SearchBar({ neighborhoods, onSubmit }: SearchBarProps) {
                 components={{ DropdownIndicator: () => null }}
                 styles={styles.select}
                 onChange={(option) => {
-                    setValue(option)
+                    onSubmit(option.value);
                 }}
             />
         </div>
