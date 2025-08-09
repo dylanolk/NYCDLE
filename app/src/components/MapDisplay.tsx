@@ -39,8 +39,9 @@ export function MapDisplay({ neighborhoods }: NeighborhoodProps) {
         <div style={styles.box}>
             <svg id="my-svg" viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }} >
                 {
-                    neighborhoods.map((neighborhood) => <Neighborhood neighborhood={neighborhood} />)
+                    neighborhoods.map((neighborhood) => <Neighborhood key={neighborhood.id} neighborhood={neighborhood} />)
                 }
+                <polygon points="0,0 1,1" />
             </svg>
         </div>
 

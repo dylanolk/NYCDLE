@@ -1,5 +1,6 @@
 import Select from 'react-select';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext';
 
 type Neighborhood = {
     id: string | number;
@@ -8,12 +9,12 @@ type Neighborhood = {
 
 type SearchBarProps = {
     neighborhoods: Neighborhood[];
-    onSubmit: CallableFunction;
 };
 
-export function SearchBar({ neighborhoods, onSubmit }: SearchBarProps) {
+export function SearchBar({ neighborhoods }: SearchBarProps) {
     const options = neighborhoods.map(n => ({ value: n.id, label: n.name }));
     const [value, setValue] = useState<{ value: string | number; label: string } | null>(null);
+    const context = useContext(NeighborhoodsContext)
 
     const styles = {
         select: {
@@ -48,7 +49,7 @@ export function SearchBar({ neighborhoods, onSubmit }: SearchBarProps) {
                 components={{ DropdownIndicator: () => null }}
                 styles={styles.select}
                 onChange={(option) => {
-                    onSubmit(option.value);
+                    context.current[option.value].setEnabled(true);
                 }}
             />
         </div>

@@ -1,24 +1,56 @@
 import { MapDisplay } from './MapDisplay.tsx'
 import { SearchBar } from './SearchBar.tsx'
 import { CSSProperties } from 'react';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
+import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext.tsx';
+
+enum ColorCodes {
+  Good = "green",
+  Close = "orange",
+  Bad = "red"
+}
 
 export function App() {
+  const registry = useRef({});
+  return (
+    <NeighborhoodsContext.Provider value={registry}>
+      <AppInner />
+    </NeighborhoodsContext.Provider>
+  )
+}
+
+function AppInner() {
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
+  const [gameState, setGameState] = useState({
+  })
+
+  const context = useContext(NeighborhoodsContext)
+
+  function onSubmit(e) {
+    e.preventDefault();
+    console.log(e.value);
+    context.current[e.value].setEnabled(true)
+  }
 
   useEffect(() => {
     fetchData(setNeighborhoods);
+    randomizeRoute(gameState, setGameState, neighborhoods);
   }, []);
 
-  function enable_neighborhood(id) {
-    setNeighborhoods(prev =>
-      prev.map(n =>
-        n.id === id ? { ...n, enabled: false } : n
-      )
-    );
-  }
+  useEffect(() => {
+    if (
+      neighborhoods.length === 0 ||
+      !context.current[gameState.start_neighborhood_id] ||
+      !context.current[gameState.end_neighborhood_id]
+    ) {
+      return; // Wait until neighborhoods loaded and refs registered
+    }
 
+    context.current[gameState.start_neighborhood_id].setEnabled(true);
+    context.current[gameState.end_neighborhood_id].setEnabled(true);
+
+  }, [neighborhoods, context, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
   const wrapper: CSSProperties = {
     height: '100vh',
@@ -32,11 +64,11 @@ export function App() {
     padding: 0,
     overflow: 'hidden',
   }
+
   return (
-    // <Header /> 
     <div style={wrapper}>
       <MapDisplay neighborhoods={neighborhoods} />
-      <SearchBar neighborhoods={neighborhoods} onSubmit={enable_neighborhood} />
+      <SearchBar neighborhoods={neighborhoods} onSubmit={onSubmit} />
     </div>
   )
 
@@ -58,4 +90,14 @@ async function fetchData(setNeighborhoods: (neighborhoods: any) => void) {
   setNeighborhoods(result.data);
 }
 
+function randomizeRoute(prev, setGameState, neighborhoods) {
+  const start_neighborhood_id = 0;
+  const end_neighborhood_id = 5;
+
+  setGameState({
+    ...prev,
+    start_neighborhood_id: start_neighborhood_id,
+    end_neighborhood_id: end_neighborhood_id
+  })
+}
 

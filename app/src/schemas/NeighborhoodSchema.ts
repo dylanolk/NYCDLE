@@ -17,7 +17,7 @@ const NeighborhoodSchema = z.object({
     boroname: z.string(),
     geometry: GeomSchema,
     polygons: z.array(z.array(z.array((z.number())))),
-    enabled: z.boolean().default(true)
+    enabled: z.boolean().default(false)
 });
 
 
