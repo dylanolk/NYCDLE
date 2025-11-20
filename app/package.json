@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@mapbox/sphericalmercator": "^2.0.1",
-    "npm": "^11.4.2",
+    "npm": "^11.6.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-select": "^5.10.1",
