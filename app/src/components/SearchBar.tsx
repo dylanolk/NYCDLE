@@ -9,12 +9,12 @@ type Neighborhood = {
 
 type SearchBarProps = {
     neighborhoods: Neighborhood[];
+    addNeighborhood: CallableFunction;
 };
 
-export function SearchBar({ neighborhoods }: SearchBarProps) {
+export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
     const options = neighborhoods.map(n => ({ value: n.id, label: n.name }));
     const [value, setValue] = useState<{ value: string | number; label: string } | null>(null);
-    const context = useContext(NeighborhoodsContext)
 
     const styles = {
         select: {
@@ -48,9 +48,7 @@ export function SearchBar({ neighborhoods }: SearchBarProps) {
                 placeholder="Search"
                 components={{ DropdownIndicator: () => null }}
                 styles={styles.select}
-                onChange={(option) => {
-                    context.current[option.value].setEnabled(true);
-                }}
+                onChange={(option) => addNeighborhood(option.value)}
             />
         </div>
     );

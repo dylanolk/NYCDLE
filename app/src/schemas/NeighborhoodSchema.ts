@@ -15,7 +15,8 @@ const NeighborhoodSchema = z.object({
     borders: z.array(z.number()),
     name: z.string(),
     boroname: z.string(),
-    geometry: GeomSchema,
+    distances: z.array(z.number().nullable()),
+    geometry: GeomSchema, //unused, deprecate
     polygons: z.array(z.array(z.array((z.number())))),
     enabled: z.boolean().default(false)
 });

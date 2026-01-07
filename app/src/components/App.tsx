@@ -22,19 +22,36 @@ export function App() {
 
 function AppInner() {
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
+  const [neighborhoodsDict, setNeighborhoodsDict] = useState({});
   const [gameState, setGameState] = useState({
+    neighborhoods_guessed: []
   })
 
   const context = useContext(NeighborhoodsContext)
 
-  function onSubmit(e) {
-    e.preventDefault();
-    console.log(e.value);
-    context.current[e.value].setEnabled(true)
+  function addNeighborhood(value) {
+    context.current[value].setEnabled(true)
+    setGameState({
+      ...gameState,
+      neighborhoods_guessed: [...gameState.neighborhoods_guessed, value]
+    })
+
+    //determine how good a guess is (assign green/orange/red)
+    const optimal_distance = neighborhoodsDict[gameState.start_neighborhood_id].distances[gameState.end_neighborhood_id]
+    const distance_to_end = neighborhoodsDict[value].distances[gameState.end_neighborhood_id]
+    const distance_to_start = neighborhoodsDict[value].distances[gameState.start_neighborhood_id]
+    if (distance_to_end + distance_to_start > optimal_distance) {
+      context.current[value].setColor(ColorCodes.Bad)
+    }
+
+  }
+
+  function isRouteDone() {
+
   }
 
   useEffect(() => {
-    fetchData(setNeighborhoods);
+    fetchData(setNeighborhoods, setNeighborhoodsDict);
     randomizeRoute(gameState, setGameState, neighborhoods);
   }, []);
 
@@ -68,13 +85,13 @@ function AppInner() {
   return (
     <div style={wrapper}>
       <MapDisplay neighborhoods={neighborhoods} />
-      <SearchBar neighborhoods={neighborhoods} onSubmit={onSubmit} />
+      <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
     </div>
   )
 
 }
 
-async function fetchData(setNeighborhoods: (neighborhoods: any) => void) {
+async function fetchData(setNeighborhoods: (neighborhoods: any) => void, setNeighborhoodsDict: (neighborhoodsDict: any) => void) {
   const response = await fetch('/coords.json');
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -88,6 +105,12 @@ async function fetchData(setNeighborhoods: (neighborhoods: any) => void) {
   }
 
   setNeighborhoods(result.data);
+
+  const neighborhoodsDict = {}
+  result.data.forEach((neighborhood) => {
+    neighborhoodsDict[neighborhood.id] = neighborhood;
+  });
+  setNeighborhoodsDict(neighborhoodsDict);
 }
 
 function randomizeRoute(prev, setGameState, neighborhoods) {
