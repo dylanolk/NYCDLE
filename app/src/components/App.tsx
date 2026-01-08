@@ -4,6 +4,7 @@ import { CSSProperties } from 'react';
 import { useEffect, useState, useRef, useContext } from "react";
 import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
 import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext.tsx';
+import { EndScreen } from './EndScreen.tsx';
 
 enum ColorCodes {
   Good = "green",
@@ -26,6 +27,7 @@ function AppInner() {
   const [gameState, setGameState] = useState({
     neighborhoods_guessed: []
   })
+  const [endScreenVisible, setEndScreenVisible] = useState(false);
 
   const context = useContext(NeighborhoodsContext)
 
@@ -40,15 +42,39 @@ function AppInner() {
     const optimal_distance = neighborhoodsDict[gameState.start_neighborhood_id].distances[gameState.end_neighborhood_id]
     const distance_to_end = neighborhoodsDict[value].distances[gameState.end_neighborhood_id]
     const distance_to_start = neighborhoodsDict[value].distances[gameState.start_neighborhood_id]
-    if (distance_to_end + distance_to_start > optimal_distance) {
+    if (distance_to_end + distance_to_start > optimal_distance || distance_to_start === null) {
       context.current[value].setColor(ColorCodes.Bad)
     }
 
+    if (isRouteDone(value)) {
+      setEndScreenVisible(true);
+    }
   }
 
-  function isRouteDone() {
+  function isRouteDone(last_guess) {
+    // DFS of neighborhoods (only checking ones that have been guessed)
+    let stack = [gameState.start_neighborhood_id]
+    const visited = new Set([gameState.start_neighborhood_id]);
+    const guessed = gameState.neighborhoods_guessed.concat([last_guess])
 
+    while (stack.length > 0) {
+      const current = stack.pop()
+      if (current === gameState.end_neighborhood_id) {
+        return true;
+      }
+      const current_neighborhood = neighborhoodsDict[current]
+      const neighbors = current_neighborhood.borders
+      for (let i = 0; i < neighbors.length; i++) {
+        if (!visited.has(neighbors[i]) && guessed.includes(neighbors[i])) {
+          visited.add(neighbors[i])
+          stack.push(neighbors[i])
+          console.log(neighbors[i])
+        }
+      }
+    }
+    return false;
   }
+
 
   useEffect(() => {
     fetchData(setNeighborhoods, setNeighborhoodsDict);
@@ -86,6 +112,7 @@ function AppInner() {
     <div style={wrapper}>
       <MapDisplay neighborhoods={neighborhoods} />
       <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
+      <EndScreen endScreenVisible={endScreenVisible} />
     </div>
   )
 
@@ -120,7 +147,8 @@ function randomizeRoute(prev, setGameState, neighborhoods) {
   setGameState({
     ...prev,
     start_neighborhood_id: start_neighborhood_id,
-    end_neighborhood_id: end_neighborhood_id
+    end_neighborhood_id: end_neighborhood_id,
+    neighborhoods_guessed: [end_neighborhood_id]
   })
 }
 
