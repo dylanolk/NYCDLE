@@ -92,7 +92,6 @@ function AppInner() {
         if (!visited.has(neighbors[i]) && guessed.includes(neighbors[i])) {
           visited.add(neighbors[i])
           stack.push(neighbors[i])
-          console.log(neighbors[i])
         }
       }
     }
@@ -132,13 +131,13 @@ function AppInner() {
     overflow: 'hidden',
   }
 
-  const enabledIds = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
+  const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
   return (
     <div style={wrapper}>
       <div><p> Today I want to go from <strong>{start_neighborhood_name}</strong> to <strong>{end_neighborhood_name}</strong></p></div>
-      <MapDisplay neighborhoods={neighborhoods} enabledIds={enabledIds} />
+      <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
       <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
       <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
     </div>
@@ -147,7 +146,7 @@ function AppInner() {
 }
 
 async function fetchData(setNeighborhoods: (neighborhoods: any) => void, setNeighborhoodsDict: (neighborhoodsDict: any) => void) {
-  const response = await fetch('/coords.json');
+  const response = await fetch(`${import.meta.env.BASE_URL}coords.json`);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -170,7 +169,7 @@ async function fetchData(setNeighborhoods: (neighborhoods: any) => void, setNeig
 
 function randomizeRoute(prev, setGameState, neighborhoods) {
   const start_neighborhood_id = 0;
-  const end_neighborhood_id = 5;
+  const end_neighborhood_id = 7;
 
   setGameState({
     ...prev,
