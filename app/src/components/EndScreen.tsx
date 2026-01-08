@@ -17,7 +17,7 @@ const emoji_dict = {
 export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreenProps) {
     const [copied, setCopied] = useState(false);
     const emoji_string = colorTracker.map((color) => emoji_dict[color]).join('')
-    const textToCopy = `I just beat today's WARDle \n ${emoji_string} \n wardle.dylanolk.com`;
+    const textToCopy = `I just beat today's WARDle!\n ${emoji_string}\ndylanolk.github.io/NYCDLE`;
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(textToCopy);
