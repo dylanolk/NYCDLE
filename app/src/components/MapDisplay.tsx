@@ -23,7 +23,6 @@ export function MapDisplay({ neighborhoods }: NeighborhoodProps) {
     useEffect(() => {
         if (!neighborhoods || neighborhoods.length === 0) return;
         const panZoom = svgPanZoom('#my-svg', {
-            fit: true,
             center: true,
             zoomScaleSensitivity: 1.5,
             minZoom: .9,

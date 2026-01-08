@@ -6,7 +6,7 @@ import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
 import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext.tsx';
 import { EndScreen } from './EndScreen.tsx';
 
-enum ColorCodes {
+export enum ColorCodes {
   Good = "green",
   Close = "orange",
   Bad = "red"
@@ -25,30 +25,54 @@ function AppInner() {
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
   const [neighborhoodsDict, setNeighborhoodsDict] = useState({});
   const [gameState, setGameState] = useState({
-    neighborhoods_guessed: []
+    neighborhoods_guessed: [],
+    color_tracker: [],
+    start_neighborhood_id: null,
+    end_neighborhood_id: null
   })
   const [endScreenVisible, setEndScreenVisible] = useState(false);
 
   const context = useContext(NeighborhoodsContext)
 
   function addNeighborhood(value) {
+    if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
+      return
+    }
     context.current[value].setEnabled(true)
-    setGameState({
-      ...gameState,
-      neighborhoods_guessed: [...gameState.neighborhoods_guessed, value]
-    })
 
     //determine how good a guess is (assign green/orange/red)
+    let color_score = null
     const optimal_distance = neighborhoodsDict[gameState.start_neighborhood_id].distances[gameState.end_neighborhood_id]
     const distance_to_end = neighborhoodsDict[value].distances[gameState.end_neighborhood_id]
     const distance_to_start = neighborhoodsDict[value].distances[gameState.start_neighborhood_id]
-    if (distance_to_end + distance_to_start > optimal_distance || distance_to_start === null) {
+    if (distance_to_end + distance_to_start > optimal_distance + 3 || distance_to_start === null) {
       context.current[value].setColor(ColorCodes.Bad)
+      color_score = ColorCodes.Bad
     }
+    else if (distance_to_end + distance_to_start > optimal_distance) {
+      context.current[value].setColor(ColorCodes.Close)
+      color_score = ColorCodes.Close
+    }
+    else {
+      context.current[value].setColor(ColorCodes.Good)
+      color_score = ColorCodes.Good
+    }
+
+    setGameState({
+      ...gameState,
+      neighborhoods_guessed: [...gameState.neighborhoods_guessed, value],
+      color_tracker: [...gameState.color_tracker, color_score]
+    })
+
 
     if (isRouteDone(value)) {
       setEndScreenVisible(true);
+      setAllEnabled();
     }
+  }
+
+  function setAllEnabled() {
+    Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
   }
 
   function isRouteDone(last_guess) {
@@ -108,11 +132,15 @@ function AppInner() {
     overflow: 'hidden',
   }
 
+  const enabledIds = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
+  const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
+  const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
   return (
     <div style={wrapper}>
-      <MapDisplay neighborhoods={neighborhoods} />
+      <div><p> Today I want to go from <strong>{start_neighborhood_name}</strong> to <strong>{end_neighborhood_name}</strong></p></div>
+      <MapDisplay neighborhoods={neighborhoods} enabledIds={enabledIds} />
       <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
-      <EndScreen endScreenVisible={endScreenVisible} />
+      <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
     </div>
   )
 

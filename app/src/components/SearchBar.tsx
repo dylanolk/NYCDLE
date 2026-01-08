@@ -13,7 +13,7 @@ type SearchBarProps = {
 };
 
 export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
-    const options = neighborhoods.map(n => ({ value: n.id, label: n.name }));
+    const options = neighborhoods.map(n => ({ value: n.id, label: n.name })).sort((a, b) => a.label > b.label ? 1 : -1);
     const [value, setValue] = useState<{ value: string | number; label: string } | null>(null);
 
     const styles = {
