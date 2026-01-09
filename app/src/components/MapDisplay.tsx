@@ -20,8 +20,8 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
             backgroundColor: 'white',
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-            height: '80vh',
-            width: '60vw'
+            height: '70%',
+            width: '100%'
         },
     };
     useEffect(() => {

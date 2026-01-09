@@ -33,9 +33,8 @@ export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
             }),
         },
         box: {
-            width: '40vw',
-            height: '20vh',
-            margin: "2vh"
+            width: '100%',
+            margin: "2%"
         }
     };
 

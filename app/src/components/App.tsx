@@ -5,6 +5,8 @@ import { useEffect, useState, useRef, useContext } from "react";
 import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
 import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext.tsx';
 import { EndScreen } from './EndScreen.tsx';
+import seedrandom from "seedrandom";
+import { HintBox } from './HintBox.tsx';
 
 export enum ColorCodes {
   Good = "green",
@@ -101,8 +103,13 @@ function AppInner() {
 
   useEffect(() => {
     fetchData(setNeighborhoods, setNeighborhoodsDict);
-    randomizeRoute(gameState, setGameState, neighborhoods);
-  }, []);
+  }, []
+  );
+  useEffect(() => {
+    randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict);
+  }, [neighborhoods]
+  );
+
 
   useEffect(() => {
     if (
@@ -130,16 +137,29 @@ function AppInner() {
     padding: 0,
     overflow: 'hidden',
   }
-
+  const middle_div: CSSProperties = {
+    width: "40%",
+    height: "90%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: 'center',
+    flexDirection: 'column',
+  }
+  function showNextNeighborhood() {
+    return true
+  }
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
   return (
     <div style={wrapper}>
-      <div><p> Today I want to go from <strong>{start_neighborhood_name}</strong> to <strong>{end_neighborhood_name}</strong></p></div>
-      <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
-      <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
-      <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
+      <div style={middle_div}>
+        <div><p> Today I want to go from <strong>{start_neighborhood_name}</strong> to <strong>{end_neighborhood_name}</strong></p></div>
+        <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
+        <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
+        <HintBox showNextNeighborhood={showNextNeighborhood} />
+        <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
+      </div>
     </div>
   )
 
@@ -167,9 +187,28 @@ async function fetchData(setNeighborhoods: (neighborhoods: any) => void, setNeig
   setNeighborhoodsDict(neighborhoodsDict);
 }
 
-function randomizeRoute(prev, setGameState, neighborhoods) {
-  const start_neighborhood_id = 0;
-  const end_neighborhood_id = 7;
+function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict) {
+  if (!neighborhoods.length) {
+    return
+  }
+
+  let date = new Date()
+  let day = date.getDate() + 1;
+  let month = date.getMonth() + 1;
+  let year = date.getFullYear();
+  let currentDate = `${day}-${month}-${year}`;
+
+  const rng = seedrandom(currentDate)
+  const start_neighborhood_id = Math.floor(rng() * neighborhoods.length);
+
+  const end_candidates = []
+  const distances = neighborhoodsDict[start_neighborhood_id].distances
+  for (let i = 0; i < distances.length; i++) {
+    if (distances[i] > 3 && distances[i] < 8) {
+      end_candidates.push(i)
+    }
+  }
+  const end_neighborhood_id = end_candidates[Math.floor(rng() * end_candidates.length)]
 
   setGameState({
     ...prev,

@@ -16,6 +16,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-select": "^5.10.1",
+    "seed-random": "^2.2.0",
+    "seedrandom": "^3.0.5",
     "svg-pan-zoom": "^3.6.2",
     "zod": "^3.25.67"
   },
