@@ -6,3 +6,9 @@ generate-node-graph:
 
 find-shortest-paths: 
 	PYTHONPATH=. python ./scripts/find_shortest_paths/script.py
+
+
+run_all_scripts: 
+	PYTHONPATH=. python ./scripts/get_neighborhood_data/script.py
+	PYTHONPATH=. python ./scripts/generate_node_graph/script.py
+	PYTHONPATH=. python ./scripts/find_shortest_paths/script.py

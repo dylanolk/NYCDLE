@@ -88,11 +88,53 @@ def project_polygons_to_screen(neighborhoods: list[Neighborhood], width, height)
     return neighborhoods
 
 
+def merge_like_neighborhoods(neighborhoods: list[Neighborhood]):
+    neighborhoods_dict = {}
+    for neighborhood in neighborhoods:
+        original_name = neighborhood.name
+        if original_name != "Co-op City":  # exception to dash rule
+            name_tuple = ()
+            for name in original_name.split("-"):
+                name = name.removesuffix("(North)")
+                name = name.removesuffix("(South)")
+                name = name.removesuffix("(East)")
+                name = name.removesuffix("(West)")
+                name = name.removesuffix("(Central)")
+                name = name.strip()
+                name_tuple = name_tuple + (name,)
+
+            key = find_dict_entry(dict=neighborhoods_dict, tuple=name_tuple)
+            if key:
+                neighborhoods_dict[key].polygons += neighborhood.polygons
+                neighborhoods_dict[
+                    key
+                ].geometry.coordinates += neighborhood.geometry.coordinates
+                new_key = key + tuple(name for name in name_tuple if name not in key)
+                if key != new_key:
+                    neighborhoods_dict[new_key] = neighborhoods_dict[key]
+                    del neighborhoods_dict[key]
+            else:
+                neighborhoods_dict[name_tuple] = neighborhood
+    for k in neighborhoods_dict.keys():
+        neighborhoods_dict[k].name = "-".join(k)
+    return neighborhoods_dict.values()
+
+
+def find_dict_entry(dict: dict, tuple: tuple):
+    for i in tuple:
+        for k, v in dict.items():
+            if i in k:
+                return k
+    return None
+
+
 neighborhoods = [populate_polygons(neighborhood) for neighborhood in neighborhoods]
 
 neighborhoods = project_polygons_to_screen(neighborhoods, 1920, 1080)
 
+neighborhoods = merge_like_neighborhoods(neighborhoods)
 
-with open("app\coords.json", "w") as file:
+
+with open("app/public/coords.json", "w") as file:
     out_neighborhoods = [asdict(neighborhood) for neighborhood in neighborhoods]
     json.dump(out_neighborhoods, file)

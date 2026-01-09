@@ -20,11 +20,22 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
     }, []);
 
     return (
-        neighborhood.polygons.map((polygon: any[], j: number) => (
-            <polygon key={`${neighborhood.id}-${j}`} points={join_polygon(polygon)} fill={enabled ? color : "transparent"} stroke={enabled ? "black" : "transparent"}>
-                {enabled ? <title> {neighborhood.name}</title> : null}
-            </polygon>
-        ))
+        <g>
+            {
+                neighborhood.polygons.map((polygon: any[], j: number) => (
+                    <polygon key={`${neighborhood.id}-${j}-halo`} points={join_polygon(polygon)} fill={enabled ? "black" : 'transparent'} stroke={enabled ? "black" : "transparent"} strokeWidth="3">
+                        {enabled ? <title> {neighborhood.name}</title> : null}
+                    </polygon>
+                ))
+            }
+            {
+                neighborhood.polygons.map((polygon: any[], j: number) => (
+                    <polygon key={`${neighborhood.id}-${j}-fill`} points={join_polygon(polygon)} fill={enabled ? color : "transparent"} stroke={"transparent"}>
+                        {enabled ? <title> {neighborhood.name}</title> : null}
+                    </polygon>
+                ))
+            }
+        </g>
     )
 }
 

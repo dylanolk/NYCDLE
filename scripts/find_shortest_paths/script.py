@@ -4,7 +4,7 @@ from scripts.generate_node_graph.internal_schemas import NeighborhoodSchema
 from dataclasses import asdict
 
 data = {}
-with open("app/coords.json", "r") as file:
+with open("app/public/coords.json", "r") as file:
     data = json.load(file)
 
 neighborhoods: list[Neighborhood] = NeighborhoodSchema().load(data, many=True)
@@ -38,6 +38,6 @@ def bfs_shortest_path(neighborhood: Neighborhood, graph: dict[int, list[int]]):
 for neighborhood in neighborhoods:
     neighborhood.distances = bfs_shortest_path(neighborhood, graph)
 
-with open("app\coords.json", "w") as file:
+with open("app/public/coords.json", "w") as file:
     out_neighborhoods = [asdict(neighborhood) for neighborhood in neighborhoods]
     json.dump(out_neighborhoods, file)
