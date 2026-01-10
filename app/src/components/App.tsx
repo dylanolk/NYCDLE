@@ -122,7 +122,9 @@ function AppInner() {
     }
 
     context.current[gameState.start_neighborhood_id].setEnabled(true);
+    context.current[gameState.start_neighborhood_id].setColor('#E58A8A');
     context.current[gameState.end_neighborhood_id].setEnabled(true);
+    context.current[gameState.end_neighborhood_id].setColor('#7DA9E8');
 
   }, [neighborhoods, context, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
@@ -147,7 +149,21 @@ function AppInner() {
     flexDirection: 'column',
   }
   function showNextNeighborhood() {
-    return true
+    const start_neighborhood = neighborhoodsDict[gameState.start_neighborhood_id]
+    const optimal_distance = start_neighborhood.distances[gameState.end_neighborhood_id]
+
+    for (let distance = 0; distance < optimal_distance; distance++) {
+      if (!gameState.neighborhoods_guessed.map((id) => start_neighborhood[id]).some((value) => value == distance)) {
+        setGameState({ ...gameState, neighborhoods_guessed: [...gameState.neighborhoods_guessed,] })
+      }
+    }
+  }
+  function showAllOutlines() {
+    Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
+  }
+  function giveUp() {
+    setEndScreenVisible(true)
+    setAllEnabled()
   }
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
@@ -158,7 +174,7 @@ function AppInner() {
         <Header startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
-        <HintBox showNextNeighborhood={showNextNeighborhood} />
+        <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />
         <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
       </div>
     </div>

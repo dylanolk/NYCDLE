@@ -9,7 +9,7 @@ type NeighborhoodProps = {
 export function Neighborhood({ neighborhood }: NeighborhoodProps) {
     const context = useContext(NeighborhoodsContext);
     const [enabled, setEnabled] = useState(false)
-    const [color, setColor] = useState("lightblue")
+    const [color, setColor] = useState("lightgray")
 
     useEffect(() => {
         context.current[neighborhood.id] = { setEnabled, setColor };
