@@ -7,6 +7,7 @@ import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext.tsx';
 import { EndScreen } from './EndScreen.tsx';
 import seedrandom from "seedrandom";
 import { HintBox } from './HintBox.tsx';
+import { Header } from './Header.tsx';
 
 export enum ColorCodes {
   Good = "green",
@@ -154,7 +155,7 @@ function AppInner() {
   return (
     <div style={wrapper}>
       <div style={middle_div}>
-        <div><p> Today I want to go from <strong>{start_neighborhood_name}</strong> to <strong>{end_neighborhood_name}</strong></p></div>
+        <Header startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
         <HintBox showNextNeighborhood={showNextNeighborhood} />
