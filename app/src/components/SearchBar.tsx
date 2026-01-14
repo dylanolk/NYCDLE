@@ -1,54 +1,141 @@
-import Select from 'react-select';
-import { useState, useContext } from 'react';
-import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext';
+import Select from 'react-select'
+import { useState } from 'react'
+import { Search } from 'lucide-react'
 
 type Neighborhood = {
-    id: string | number;
-    name: string;
-};
+    id: string | number
+    name: string
+}
 
 type SearchBarProps = {
-    neighborhoods: Neighborhood[];
-    addNeighborhood: CallableFunction;
-};
+    neighborhoods: Neighborhood[]
+    addNeighborhood: CallableFunction
+}
 
 export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
-    const options = neighborhoods.map(n => ({ value: n.id, label: n.name })).sort((a, b) => a.label > b.label ? 1 : -1);
-    const [value, setValue] = useState<{ value: string | number; label: string } | null>(null);
+    const [value, setValue] = useState<{ value: string | number; label: string } | null>(null)
+    const [inputValue, setInputValue] = useState('')
 
-    const styles = {
-        select: {
-            control: (base: any) => ({
-                ...base,
-                width: '100%',
-                minHeight: 50,
-                paddingTop: 4,
-                paddingBottom: 4,
-                cursor: 'text',
-            }),
-            valueContainer: (base: any) => ({
-                ...base,
-                paddingTop: 0,
-                paddingBottom: 0,
-            }),
-        },
-        box: {
-            width: '100%',
-            margin: "2%"
-        }
-    };
+    const baseOptions = neighborhoods.map((n) => ({
+        value: n.id,
+        label: n.name,
+    }))
+
+    const getSortedOptions = () => {
+        const query = inputValue.toLowerCase()
+        if (!query) return [...baseOptions].sort((a, b) => a.label.localeCompare(b.label))
+
+        return [...baseOptions]
+            .filter((o) => o.label.toLowerCase().includes(query))
+            .sort((a, b) => {
+                const aLabel = a.label.toLowerCase()
+                const bLabel = b.label.toLowerCase()
+
+                const aStarts = aLabel.startsWith(query)
+                const bStarts = bLabel.startsWith(query)
+                if (aStarts !== bStarts) return aStarts ? -1 : 1
+
+                const aWord = aLabel.split(' ').some((w) => w.startsWith(query))
+                const bWord = bLabel.split(' ').some((w) => w.startsWith(query))
+                if (aWord !== bWord) return aWord ? -1 : 1
+
+                return aLabel.indexOf(query) - bLabel.indexOf(query)
+            })
+    }
+
+    const selectStyles = {
+        control: (base: any, state: any) => ({
+            ...base,
+            minHeight: 52,
+            borderRadius: 18,
+            background: '#fefcf9', // soft off-white, visible but gentle
+            border: state.isFocused ? '2px solid #d1a054' : '1px solid #e2d6c8', // subtle earthy accent
+            boxShadow: state.isFocused
+                ? '0 0 0 4px rgba(209,160,84,0.2)'
+                : '0 4px 12px rgba(0,0,0,0.08)',
+            cursor: 'text',
+            transition: 'all 0.2s ease',
+            transform: state.isFocused ? 'scale(1.02)' : 'scale(1)',
+        }),
+
+        valueContainer: (base: any) => ({ ...base, padding: '0 16px' }),
+
+        input: (base: any) => ({
+            ...base,
+            margin: 0,
+            padding: 0,
+            fontSize: 16,
+            fontWeight: 500,
+        }),
+
+        placeholder: (base: any) => ({
+            ...base,
+            color: '#7c5e42', // subtle, readable
+            fontWeight: 500,
+            fontSize: 16,
+        }),
+
+        singleValue: (base: any) => ({
+            ...base,
+            fontSize: 16,
+            fontWeight: 600,
+            color: '#533f2e',
+        }),
+
+        menu: (base: any) => ({
+            ...base,
+            borderRadius: 14,
+            boxShadow: '0 16px 32px rgba(0,0,0,0.12)',
+            overflow: 'hidden',
+        }),
+
+        option: (base: any, state: any) => ({
+            ...base,
+            padding: '12px 16px',
+            backgroundColor: state.isFocused
+                ? '#f6f2ed'
+                : state.isSelected
+                    ? '#ede3d7'
+                    : 'white',
+            color: '#533f2e',
+            cursor: 'pointer',
+            fontWeight: state.isSelected ? 600 : 500,
+        }),
+
+        indicatorsContainer: (base: any) => ({
+            ...base,
+            display: 'flex',
+            alignItems: 'center',
+            paddingRight: 12,
+        }),
+    }
+
+    const customComponents = {
+        DropdownIndicator: () => null,
+        IndicatorSeparator: () => null,
+        IndicatorsContainer: ({ innerProps }: any) => (
+            <div {...innerProps} style={{ display: 'flex', alignItems: 'center', paddingRight: 12 }}>
+                <Search size={18} color="#533f2e" />
+            </div>
+        ),
+    }
 
     return (
-        <div style={styles.box}>
+        <div style={{ width: '100%', padding: '8px 12px' }}>
             <Select
-                options={options}
-                isClearable
+                options={getSortedOptions()}
                 value={value}
-                placeholder="Search"
-                components={{ DropdownIndicator: () => null }}
-                styles={styles.select}
-                onChange={(option) => addNeighborhood(option.value)}
+                isClearable
+                placeholder="Search neighborhoods…"
+                styles={selectStyles}
+                inputValue={inputValue}
+                components={customComponents}
+                onInputChange={(val) => setInputValue(val)}
+                onChange={(option) => {
+                    setValue(option)
+                    if (option) addNeighborhood(option.value)
+                }}
             />
         </div>
-    );
+    )
 }
