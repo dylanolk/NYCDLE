@@ -44,27 +44,12 @@ function AppInner() {
     context.current[value].setEnabled(true)
 
     //determine how good a guess is (assign green/orange/red)
-    let color_score = null
-    const optimal_distance = neighborhoodsDict[gameState.start_neighborhood_id].distances[gameState.end_neighborhood_id]
-    const distance_to_end = neighborhoodsDict[value].distances[gameState.end_neighborhood_id]
-    const distance_to_start = neighborhoodsDict[value].distances[gameState.start_neighborhood_id]
-    if (distance_to_end + distance_to_start > optimal_distance + 3 || distance_to_start === null) {
-      context.current[value].setColor(ColorCodes.Bad)
-      color_score = ColorCodes.Bad
-    }
-    else if (distance_to_end + distance_to_start > optimal_distance) {
-      context.current[value].setColor(ColorCodes.Close)
-      color_score = ColorCodes.Close
-    }
-    else {
-      context.current[value].setColor(ColorCodes.Good)
-      color_score = ColorCodes.Good
-    }
-
+    const color_code = determineScore(value)
+    context.current[value].setColor(color_code)
     setGameState({
       ...gameState,
       neighborhoods_guessed: [...gameState.neighborhoods_guessed, value],
-      color_tracker: [...gameState.color_tracker, color_score]
+      color_tracker: [...gameState.color_tracker, color_code]
     })
 
 
@@ -73,6 +58,66 @@ function AppInner() {
       setAllEnabled();
     }
   }
+
+  function determineScore(value) {
+    const optimal_path = optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id)
+    const optimal_distance = optimal_path.length
+    const path_to_end = optimalDistance(value, gameState.end_neighborhood_id)
+    const distance_to_end = path_to_end ? path_to_end.length : null
+    const path_to_start = optimalDistance(value, gameState.start_neighborhood_id)
+    const distance_to_start = path_to_start ? path_to_start.length : null
+
+    if (distance_to_end + distance_to_start > optimal_distance + 3 || distance_to_start === null) {
+      return ColorCodes.Bad
+    }
+    if (distance_to_end + distance_to_start > optimal_distance) {
+      return ColorCodes.Close
+    }
+    return ColorCodes.Good
+  }
+
+  function optimalDistance(id_1, id_2) {
+    if (id_1 === id_2) return [id_1];
+
+    let dequeue = [{ id: id_1, path: [] }];
+    let visited = new Set([id_1]);
+
+    while (dequeue.length > 0) {
+      let { id: current_id, path } = dequeue.shift();
+      let current_neighborhood = neighborhoodsDict[current_id];
+
+      for (let neighbor_id of current_neighborhood.borders) {
+        if (visited.has(neighbor_id)) continue;
+
+        let newPath = [];
+        if (!gameState.neighborhoods_guessed.includes(neighbor_id)) {
+          newPath = [...path, neighbor_id];
+          dequeue.push({
+            id: neighbor_id,
+            path: newPath
+          });
+        }
+        else {
+          newPath = path
+          dequeue.unshift({
+            id: neighbor_id,
+            path: newPath
+          });
+        }
+
+        if (neighbor_id === id_2) {
+          return newPath;
+        }
+
+        visited.add(neighbor_id);
+
+
+      }
+    }
+
+    return null;
+  }
+
 
   function setAllEnabled() {
     Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
@@ -106,6 +151,7 @@ function AppInner() {
     fetchData(setNeighborhoods, setNeighborhoodsDict);
   }, []
   );
+
   useEffect(() => {
     randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict);
   }, [neighborhoods]
@@ -149,14 +195,10 @@ function AppInner() {
     flexDirection: 'column',
   }
   function showNextNeighborhood() {
-    const start_neighborhood = neighborhoodsDict[gameState.start_neighborhood_id]
-    const optimal_distance = start_neighborhood.distances[gameState.end_neighborhood_id]
+    const optimal_path = optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id)
+    console.log(optimal_path)
+    addNeighborhood(optimal_path.shift())
 
-    for (let distance = 0; distance < optimal_distance; distance++) {
-      if (!gameState.neighborhoods_guessed.map((id) => start_neighborhood[id]).some((value) => value == distance)) {
-        setGameState({ ...gameState, neighborhoods_guessed: [...gameState.neighborhoods_guessed,] })
-      }
-    }
   }
   function showAllOutlines() {
     Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
@@ -216,7 +258,7 @@ function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict) {
   let currentDate = `${day}-${month}-${year}`;
 
   const rng = seedrandom(currentDate)
-  const start_neighborhood_id = Math.floor(rng() * neighborhoods.length);
+  const start_neighborhood_id = 0
 
   const end_candidates = []
   const distances = neighborhoodsDict[start_neighborhood_id].distances
@@ -225,7 +267,7 @@ function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict) {
       end_candidates.push(i)
     }
   }
-  const end_neighborhood_id = end_candidates[Math.floor(rng() * end_candidates.length)]
+  const end_neighborhood_id = 7
 
   setGameState({
     ...prev,
