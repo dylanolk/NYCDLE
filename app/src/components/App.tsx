@@ -110,8 +110,6 @@ function AppInner() {
         }
 
         visited.add(neighbor_id);
-
-
       }
     }
 
@@ -258,7 +256,7 @@ function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict) {
   let currentDate = `${day}-${month}-${year}`;
 
   const rng = seedrandom(currentDate)
-  const start_neighborhood_id = 0
+  const start_neighborhood_id = Math.floor(rng() * neighborhoods.length);
 
   const end_candidates = []
   const distances = neighborhoodsDict[start_neighborhood_id].distances
@@ -267,7 +265,7 @@ function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict) {
       end_candidates.push(i)
     }
   }
-  const end_neighborhood_id = 7
+  const end_neighborhood_id = end_candidates[Math.floor(rng() * end_candidates.length)]
 
   setGameState({
     ...prev,
