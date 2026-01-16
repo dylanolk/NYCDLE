@@ -1,5 +1,5 @@
 import Select from 'react-select'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Search } from 'lucide-react'
 
 type Neighborhood = {
@@ -10,11 +10,14 @@ type Neighborhood = {
 type SearchBarProps = {
     neighborhoods: Neighborhood[]
     addNeighborhood: CallableFunction
+    wrapperRef: any
 }
 
-export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
+export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: SearchBarProps) {
     const [value, setValue] = useState<{ value: string | number; label: string } | null>(null)
     const [inputValue, setInputValue] = useState('')
+
+    const inputRef = useRef(null);
 
     const baseOptions = neighborhoods.map((n) => ({
         value: n.id,
@@ -86,7 +89,7 @@ export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
             ...base,
             borderRadius: 14,
             boxShadow: '0 16px 32px rgba(0,0,0,0.12)',
-            overflow: 'hidden',
+            overflowY: 'auto',
         }),
 
         option: (base: any, state: any) => ({
@@ -120,15 +123,25 @@ export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
         ),
     }
 
+
     return (
         <div style={{ width: '100%', padding: '8px 12px' }}>
             <Select
+                ref={inputRef}
                 options={getSortedOptions()}
                 value={value}
                 isClearable
                 placeholder="Search neighborhoods…"
                 styles={selectStyles}
                 inputValue={inputValue}
+                onFocus={() => {
+                    setTimeout(() => {
+                        wrapperRef.current?.scrollTo({
+                            top: wrapperRef.current.scrollHeight,
+                            behavior: 'smooth',
+                        });
+                    }, 300);
+                }}
                 components={customComponents}
                 onInputChange={(val) => setInputValue(val)}
                 onChange={(option) => {

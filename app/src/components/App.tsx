@@ -9,6 +9,8 @@ import seedrandom from "seedrandom";
 import { HintBox } from './HintBox.tsx';
 import { Header } from './Header.tsx';
 import { LoseScreen } from './LoseScreen.tsx';
+import { initGA, logPageView } from "../analytics.tsx";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 export enum ColorCodes {
   Good = "green",
@@ -18,10 +20,22 @@ export enum ColorCodes {
 }
 
 export function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    initGA();
+  }, []);
+
+  useEffect(() => {
+    logPageView(location.pathname);
+  }, [location]);
   const registry = useRef({});
   return (
     <NeighborhoodsContext.Provider value={registry}>
-      <AppInner />
+      <Routes>
+        <Route path="/NYCDLE" element={<AppInner />} />
+
+      </Routes>
     </NeighborhoodsContext.Provider>
   )
 }
@@ -38,6 +52,8 @@ function AppInner() {
   const [endScreenVisible, setEndScreenVisible] = useState(false);
   const [gaveUp, setGaveUp] = useState(false);
   const context = useContext(NeighborhoodsContext)
+
+  const wrapperRef = useRef(null)
 
   function addNeighborhood(value, is_hint = false) {
     if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
@@ -180,7 +196,7 @@ function AppInner() {
   }, [neighborhoods, context, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
   const wrapper: CSSProperties = {
-    height: '100%',
+    height: '100dvh',
     width: '100%',
     display: 'flex',
     justifyContent: 'flex-start',
@@ -189,6 +205,7 @@ function AppInner() {
     flexDirection: 'column',
     margin: 0,
     padding: 0,
+    overflowY: 'auto'
   }
   const middle_div: CSSProperties = {
     width: window.innerWidth <= 820 ? "90%" : "40%",
@@ -214,7 +231,7 @@ function AppInner() {
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
   return (
-    <div style={wrapper}>
+    <div ref={wrapperRef} style={wrapper}>
       <div style={middle_div}>
         <Header startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />

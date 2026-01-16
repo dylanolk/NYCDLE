@@ -11,8 +11,8 @@ type NeighborhoodProps = {
 
 
 export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: NeighborhoodProps) {
-    const svgRef = useRef();
-    const gRef = useRef();
+    const svgRef = useRef(null);
+    const gRef = useRef(null);
 
     const styles = {
         box: {
