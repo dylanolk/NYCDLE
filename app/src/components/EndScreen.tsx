@@ -21,10 +21,10 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
     const [copied, setCopied] = useState(false)
     console.log('colorTracker', colorTracker)
     const emoji_string = colorTracker.map((c) => emoji_dict[c]).join('')
-    var text_to_copy = `I just beat today's WARDle!\n${emoji_string}`
+    var text_to_copy = `I just beat today's daily burrow!\n${emoji_string}`
     const hint_counter = colorTracker.filter((c) => c == ColorCodes.Hint).length
     if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hints!`
-    text_to_copy += "\ndylanolk.github.io/NYCDLE"
+    text_to_copy += "\nburrow.dylanolk.com"
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(text_to_copy)
@@ -62,7 +62,7 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
                 </DialogTitle>
 
                 <Description style={{ color: '#555', marginBottom: '16px' }}>
-                    You completed today’s WARDle
+                    You completed today’s burrow!
                 </Description>
 
                 <div
