@@ -89,7 +89,7 @@ def project_polygons_to_screen(neighborhoods: list[Neighborhood], width, height)
 
 
 def merge_like_neighborhoods(neighborhoods: list[Neighborhood]):
-    neighborhoods_dict = {}
+    neighborhoods_dict: dict[str:Neighborhood] = {}
     for neighborhood in neighborhoods:
         original_name = neighborhood.name
         if original_name != "Co-op City":  # exception to dash rule
@@ -103,7 +103,9 @@ def merge_like_neighborhoods(neighborhoods: list[Neighborhood]):
                 name = name.strip()
                 name_tuple = name_tuple + (name,)
 
-            key = find_dict_entry(dict=neighborhoods_dict, tuple=name_tuple)
+            key = find_dict_entry(
+                dict=neighborhoods_dict, tuple=name_tuple, neighborhood=neighborhood
+            )
             if key:
                 neighborhoods_dict[key].polygons += neighborhood.polygons
                 neighborhoods_dict[
@@ -120,10 +122,10 @@ def merge_like_neighborhoods(neighborhoods: list[Neighborhood]):
     return neighborhoods_dict.values()
 
 
-def find_dict_entry(dict: dict, tuple: tuple):
+def find_dict_entry(dict: dict, tuple: tuple, neighborhood: Neighborhood):
     for i in tuple:
         for k, v in dict.items():
-            if i in k:
+            if i in k and neighborhood.boroname == v.boroname:
                 return k
     return None
 
