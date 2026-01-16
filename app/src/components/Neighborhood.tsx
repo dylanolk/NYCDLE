@@ -13,6 +13,7 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
     const context = useContext(NeighborhoodsContext);
     const [enabled, setEnabled] = useState(false);
     const [color, setColor] = useState("lightgray");
+    const [showName, setShowName] = useState(false);
 
     const [hovered, setHovered] = useState(false);
     const [offset, setOffset] = useState(0);
@@ -24,7 +25,7 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
     const [labelSize, setLabelSize] = useState({ width: 0, height: 0 });
 
     useEffect(() => {
-        context.current[neighborhood.id] = { setEnabled, setColor };
+        context.current[neighborhood.id] = { setEnabled, setColor, setShowName };
         return () => delete context.current[neighborhood.id];
     }, []);
 
@@ -109,7 +110,7 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
             ))}
 
             {/* 🔹 Auto-sized hover label */}
-            {hovered && enabled && (
+            {hovered && enabled && showName && (
                 <g transform={`translate(${center.x}, ${center.y - 14})`}>
                     <rect
                         x={-(labelSize.width / 2) - 8}

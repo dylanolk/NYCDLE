@@ -8,11 +8,13 @@ import { EndScreen } from './EndScreen.tsx';
 import seedrandom from "seedrandom";
 import { HintBox } from './HintBox.tsx';
 import { Header } from './Header.tsx';
+import { LoseScreen } from './LoseScreen.tsx';
 
 export enum ColorCodes {
   Good = "green",
   Close = "orange",
-  Bad = "red"
+  Bad = "red",
+  Hint = "grey",
 }
 
 export function App() {
@@ -31,20 +33,22 @@ function AppInner() {
     neighborhoods_guessed: [],
     color_tracker: [],
     start_neighborhood_id: null,
-    end_neighborhood_id: null
+    end_neighborhood_id: null,
   })
   const [endScreenVisible, setEndScreenVisible] = useState(false);
-
+  const [gaveUp, setGaveUp] = useState(false);
   const context = useContext(NeighborhoodsContext)
 
-  function addNeighborhood(value) {
+  function addNeighborhood(value, is_hint = false) {
     if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
       return
     }
     context.current[value].setEnabled(true)
-
+    context.current[value].setShowName(true)
     //determine how good a guess is (assign green/orange/red)
-    const color_code = determineScore(value)
+    var color_code = null;
+    if (!is_hint) color_code = determineScore(value);
+    else color_code = ColorCodes.Hint;
     context.current[value].setColor(color_code)
     setGameState({
       ...gameState,
@@ -119,6 +123,7 @@ function AppInner() {
 
   function setAllEnabled() {
     Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
+    Object.values(context.current).forEach(neighborhood => neighborhood.setShowName(true));
   }
 
   function isRouteDone(last_guess) {
@@ -167,8 +172,10 @@ function AppInner() {
 
     context.current[gameState.start_neighborhood_id].setEnabled(true);
     context.current[gameState.start_neighborhood_id].setColor('#E58A8A');
+    context.current[gameState.start_neighborhood_id].setShowName(true);
     context.current[gameState.end_neighborhood_id].setEnabled(true);
     context.current[gameState.end_neighborhood_id].setColor('#7DA9E8');
+    context.current[gameState.end_neighborhood_id].setShowName(true);
 
   }, [neighborhoods, context, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
@@ -194,15 +201,14 @@ function AppInner() {
   }
   function showNextNeighborhood() {
     const optimal_path = optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id)
-    console.log(optimal_path)
-    addNeighborhood(optimal_path.shift())
-
+    var next_neighborhood = optimal_path.shift()
+    addNeighborhood(next_neighborhood, true)
   }
   function showAllOutlines() {
     Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
   }
   function giveUp() {
-    setEndScreenVisible(true)
+    setGaveUp(true)
     setAllEnabled()
   }
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
@@ -216,6 +222,7 @@ function AppInner() {
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
         <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />
         <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
+        <LoseScreen gaveUp={gaveUp} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
       </div>
     </div>
   )
@@ -256,22 +263,25 @@ function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict) {
   let currentDate = `${day}-${month}-${year}`;
 
   const rng = seedrandom(currentDate)
-  const start_neighborhood_id = Math.floor(rng() * neighborhoods.length);
-
   const end_candidates = []
-  const distances = neighborhoodsDict[start_neighborhood_id].distances
-  for (let i = 0; i < distances.length; i++) {
-    if (distances[i] > 3 && distances[i] < 8) {
-      end_candidates.push(i)
-    }
-  }
-  const end_neighborhood_id = end_candidates[Math.floor(rng() * end_candidates.length)]
+  while (!end_candidates.length) {
+    const start_neighborhood_id = Math.floor(rng() * neighborhoods.length);
 
-  setGameState({
-    ...prev,
-    start_neighborhood_id: start_neighborhood_id,
-    end_neighborhood_id: end_neighborhood_id,
-    neighborhoods_guessed: [end_neighborhood_id]
-  })
+
+    const distances = neighborhoodsDict[start_neighborhood_id].distances
+    for (let i = 0; i < distances.length; i++) {
+      if (distances[i] > 3 && distances[i] < 8) {
+        end_candidates.push(i)
+      }
+    }
+    const end_neighborhood_id = end_candidates[Math.floor(rng() * end_candidates.length)]
+
+    setGameState({
+      ...prev,
+      start_neighborhood_id: start_neighborhood_id,
+      end_neighborhood_id: end_neighborhood_id,
+      neighborhoods_guessed: [end_neighborhood_id]
+    })
+  }
 }
 

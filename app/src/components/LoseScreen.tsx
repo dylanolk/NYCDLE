@@ -4,8 +4,8 @@ import { Copy, Check } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { ColorCodes } from './App'
 
-type EndScreenProps = {
-    endScreenVisible: boolean
+type LoseScreenProps = {
+    gaveUp: boolean
     onClose: () => void
     colorTracker: any
 }
@@ -17,13 +17,16 @@ const emoji_dict = {
     grey: '⬜'
 }
 
-export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreenProps) {
+export function LoseScreen({ gaveUp, onClose, colorTracker }: LoseScreenProps) {
     const [copied, setCopied] = useState(false)
     console.log('colorTracker', colorTracker)
     const emoji_string = colorTracker.map((c) => emoji_dict[c]).join('')
-    var text_to_copy = `I just beat today's WARDle!\n${emoji_string}`
+    var text_to_copy = `I just finished today's WARDle!\n${emoji_string}`
     const hint_counter = colorTracker.filter((c) => c == ColorCodes.Hint).length
     if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hints!`
+
+    if (colorTracker.length) text_to_copy += "\n...and then I gave up!"
+    else text_to_copy += "\n...I didn't even try!"
     text_to_copy += "\ndylanolk.github.io/NYCDLE"
 
     const handleCopy = async () => {
@@ -33,7 +36,7 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
     }
 
     return (
-        <Dialog open={endScreenVisible} onClose={onClose}>
+        <Dialog open={gaveUp} onClose={onClose}>
             <div
                 style={{
                     position: 'fixed',
@@ -58,7 +61,7 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
                 }}
             >
                 <DialogTitle style={{ fontSize: '28px', fontWeight: 800 }}>
-                    🎉 You Did It!
+                    Better luck next time!
                 </DialogTitle>
 
                 <Description style={{ color: '#555', marginBottom: '16px' }}>
@@ -117,3 +120,5 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
         </Dialog>
     )
 }
+
+
