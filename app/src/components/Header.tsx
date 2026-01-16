@@ -45,10 +45,15 @@ export function Header({
         fontWeight: 700,
     };
 
+    const burrowStyle: React.CSSProperties = {
+        color: '#5f8d0aff', // pastel blue
+        fontWeight: 700,
+    };
+
     return (
         <div style={containerStyle}>
             <div style={titleStyle}>
-                Today I want to go from{' '}
+                Today I want to <span style={burrowStyle}>burrow</span> from{' '}
                 <span style={startStyle}>{startNeighborhoodName}</span>{' '}
                 to{' '}
                 <span style={endStyle}>{endNeighborhoodName}</span>
