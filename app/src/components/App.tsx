@@ -180,8 +180,8 @@ function AppInner() {
   }, [neighborhoods, context, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
   const wrapper: CSSProperties = {
-    height: '100vh',
-    width: '100vw',
+    height: '100%',
+    width: '100%',
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -189,16 +189,15 @@ function AppInner() {
     flexDirection: 'column',
     margin: 0,
     padding: 0,
-    overflow: 'hidden',
   }
   const middle_div: CSSProperties = {
-    width: "40%",
-    height: "90%",
+    width: window.innerWidth <= 820 ? "90%" : "40%",
+    height: '90%',
+    maxWidth: "1200px",
     display: "flex",
-    justifyContent: "center",
-    alignItems: 'center',
-    flexDirection: 'column',
-  }
+    flexDirection: "column",
+    alignItems: "center",
+  };
   function showNextNeighborhood() {
     const optimal_path = optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id)
     var next_neighborhood = optimal_path.shift()
@@ -222,7 +221,7 @@ function AppInner() {
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
         <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />
         <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
-        <LoseScreen gaveUp={gaveUp} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
+        <LoseScreen gaveUp={gaveUp} onClose={() => setGaveUp(false)} colorTracker={gameState.color_tracker} />
       </div>
     </div>
   )
