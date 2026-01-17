@@ -29,21 +29,6 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
         return () => delete context.current[neighborhood.id];
     }, []);
 
-    useEffect(() => {
-        if (neighborhood.polygons.length === 0) return;
-
-        let sumX = 0,
-            sumY = 0,
-            count = 0;
-        neighborhood.polygons.forEach((poly) =>
-            poly.forEach(([x, y]) => {
-                sumX += x;
-                sumY += y;
-                count++;
-            })
-        );
-        setCenter({ x: sumX / count, y: sumY / count });
-    }, [neighborhood]);
 
     // 🔹 measure label text when it appears
     useEffect(() => {
@@ -91,9 +76,9 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
             transform={`translate(0, ${offset})`}
         >
             {neighborhood.polygons.map((polygon: any[], j: number) => (
-                <polygon
+                <path
                     key={`${neighborhood.id}-${j}-halo`}
-                    points={join_polygon(polygon)}
+                    d={polygon}
                     fill={enabled ? "black" : "transparent"}
                     stroke={enabled ? "black" : "transparent"}
                     strokeWidth="3"
@@ -101,9 +86,9 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
             ))}
 
             {neighborhood.polygons.map((polygon: any[], j: number) => (
-                <polygon
+                <path
                     key={`${neighborhood.id}-${j}-fill`}
-                    points={join_polygon(polygon)}
+                    d={polygon}
                     fill={enabled ? color : "transparent"}
                     stroke="transparent"
                 />
@@ -147,8 +132,4 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
             )}
         </g>
     );
-}
-
-function join_polygon(polygon: [number, number][]) {
-    return polygon.map((pair) => pair.join(",")).join(" ");
 }
