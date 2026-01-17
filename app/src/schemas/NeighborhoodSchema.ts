@@ -15,9 +15,9 @@ const NeighborhoodSchema = z.object({
     borders: z.array(z.number()),
     name: z.string(),
     boroname: z.string(),
-    distances: z.array(z.number().nullable()),
-    polygons: z.array(z.array(z.array((z.number())))),
-    enabled: z.boolean().default(false)
+    distances: z.array(z.number().nullable()), polygons: z.array(z.array(z.array((z.number())))),
+    enabled: z.boolean().default(false),
+    bbox: z.array(z.array(z.number()))
 });
 
 

@@ -62,7 +62,7 @@ function AppInner() {
     }
     context.current[value].setEnabled(true)
     context.current[value].setShowName(true)
-    //determine how good a guess is (assign green/orange/red)
+
     var color_code = null;
     if (!is_hint) color_code = determineScore(value);
     else color_code = ColorCodes.Hint;

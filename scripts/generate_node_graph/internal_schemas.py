@@ -29,9 +29,10 @@ class NeighborhoodSchema(BaseSchema):
     id = fields.Integer(allow_none=True)
     name = fields.String()
     boroname = fields.String()
-    geometry = fields.Nested(GeometrySchema)
+    geometry = fields.Nested(GeometrySchema, allow_none = True, required= False)
     polygons = fields.List(fields.List(fields.List(fields.Float())))
     borders = fields.List(fields.Integer(), allow_none=True)
+    distances = fields.List(fields.Integer(allow_none=True), allow_none= True, required=False)
 
     @post_load
     def make_neighborhood(self, data, **kwargs):

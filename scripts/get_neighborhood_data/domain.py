@@ -17,8 +17,9 @@ class Geometry:
 class Neighborhood:
     name: str
     boroname: str
-    geometry: Geometry
     polygons: list[list[float]]
+    geometry: Geometry | None = None
     borders: list[str] | None = None
     id: int | None = None
     distances: list[int] | None = None
+    bbox: dict[str, int] | None = None
