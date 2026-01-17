@@ -4,6 +4,8 @@ from scripts.generate_node_graph.internal_schemas import NeighborhoodSchema
 from dataclasses import asdict
 import numpy as np 
 
+from svg_path_editor import SvgPath, optimize_path
+
 
 data = {}
 with open("app/public/coords.json", "r") as file:
@@ -43,7 +45,8 @@ for neighborhood in neighborhoods:
 
 print(neighborhoods[1].bbox)
 for neighborhood in neighborhoods: 
-    neighborhood.polygons = [compress_coords(polygon) for polygon in neighborhood.polygons]
+    neighborhood.polygons = [optimize_path(SvgPath(compress_coords(polygon))).as_string(minify=True) for polygon in neighborhood.polygons]
+
 
 
 with open("app/public/coords.json", "w") as file:
