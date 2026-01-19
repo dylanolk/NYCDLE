@@ -94,8 +94,10 @@ function AppInner() {
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
-      if (context.current[id]) {         // ✅ only call if exists
+      if (context.current[id]) {  
         context.current[id].setColor(color_code);
+        context.current[id].setEnabled(true);
+        context.current[id].setShowName(true)
       }
     }
   }, [gameState, context.current]); 
