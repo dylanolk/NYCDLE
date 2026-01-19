@@ -8,24 +8,24 @@ export function Header({
     endNeighborhoodName,
 }: HeaderProps) {
     const containerStyle: React.CSSProperties = {
-        flex: 2,
         border: '2px solid #4A90E2',
-        borderRadius: '16px',
-        padding: '36px 32px',
+        borderRadius: '1rem',
+        padding: '.5rem 1rem',
         width: '100%',
-        minHeight: '110px',
-        display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         background: 'linear-gradient(180deg, #F9FBFF 0%, #F1F6FF 100%)',
         boxSizing: 'border-box',
-        margin: '5%'
     };
+    const wrapperStyle: React.CSSProperties = {
+        padding: '1rem 0rem', 
+        width: '100%',
+    }
 
     const titleStyle: React.CSSProperties = {
         fontFamily:
             '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-        fontSize: 'clamp(1.2rem, 2.4vw, 1.8rem)',
+        fontSize: 'clamp(1rem, 1.2rem, 1.5rem)',
         fontWeight: 500,
         letterSpacing: '-0.015em',
         lineHeight: 1.35,
@@ -51,12 +51,14 @@ export function Header({
     };
 
     return (
-        <div style={containerStyle}>
-            <div style={titleStyle}>
-                Today I want to <span style={burrowStyle}>burrow</span> from{' '}
-                <span style={startStyle}>{startNeighborhoodName}</span>{' '}
-                to{' '}
-                <span style={endStyle}>{endNeighborhoodName}</span>
+        <div style={wrapperStyle}>
+            <div style={containerStyle}>
+                <div style={titleStyle}>
+                    Today I want to <span style={burrowStyle}>burrow</span> from{' '}
+                    <span style={startStyle}>{startNeighborhoodName}</span>{' '}
+                    to{' '}
+                    <span style={endStyle}>{endNeighborhoodName}</span>
+                </div>
             </div>
         </div>
     );

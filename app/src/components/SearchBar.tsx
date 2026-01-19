@@ -125,7 +125,7 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
 
 
     return (
-        <div style={{ width: '100%', padding: '8px 12px' }}>
+        <div style={{ width: '100%', padding: '8px 0px', marginBottom: '3rem'}}>
             <Select
                 ref={inputRef}
                 options={getSortedOptions()}
