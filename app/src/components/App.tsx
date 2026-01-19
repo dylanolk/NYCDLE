@@ -47,16 +47,16 @@ function AppInner() {
     color_tracker: [],
     start_neighborhood_id: null,
     end_neighborhood_id: null,
+    finished: false
   })
   const [endScreenVisible, setEndScreenVisible] = useState(false);
   const [gaveUp, setGaveUp] = useState(false);
-  const [finished, setFinished] = useState(false);
   const context = useContext(NeighborhoodsContext)
 
   const wrapperRef = useRef(null)
 
   function addNeighborhood(value, is_hint = false) {
-    if (finished) return;
+    if (gameState.finished) return;
     if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
       return
     }
@@ -77,7 +77,7 @@ function AppInner() {
     if (isRouteDone(value)) {
       setEndScreenVisible(true);
       setAllEnabled();
-      setFinished(true);
+      setGameState({...gameState, finished: true});
     }
   }
 
@@ -226,7 +226,7 @@ function AppInner() {
   function giveUp() {
     setGaveUp(true)
     setAllEnabled()
-    setFinished(true);
+    setGameState({...gameState, finished: true});
   }
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'

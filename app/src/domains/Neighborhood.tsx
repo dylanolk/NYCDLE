@@ -7,4 +7,5 @@ export type Neighborhood = {
     geometry: number[][][];
     polygons: number[][][];
     enabled: boolean;
+    bbox: number[][]
 };

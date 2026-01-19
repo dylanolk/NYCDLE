@@ -18,7 +18,9 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
     const [hovered, setHovered] = useState(false);
     const [offset, setOffset] = useState(0);
 
-    const [center, setCenter] = useState({ x: 0, y: 0 });
+    const center_x = (neighborhood.bbox[0][0] + neighborhood.bbox[1][0])/2
+    const top_y = neighborhood.bbox[1][1]
+    const [center, setCenter] = useState({ x: center_x, y: top_y });
 
     // 🔹 NEW: text ref + measured size
     const textRef = useRef<SVGTextElement | null>(null);
@@ -96,7 +98,7 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
 
             {/* 🔹 Auto-sized hover label */}
             {hovered && enabled && showName && (
-                <g transform={`translate(${center.x}, ${center.y - 14})`}>
+                <g transform={`translate(${center.x}, ${center.y-14})`}>
                     <rect
                         x={-(labelSize.width / 2) - 8}
                         y={-(labelSize.height / 2) - 6}
