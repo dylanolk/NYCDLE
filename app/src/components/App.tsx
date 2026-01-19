@@ -11,6 +11,7 @@ import { Header } from './Header.tsx';
 import { LoseScreen } from './LoseScreen.tsx';
 import { initGA, logPageView } from "../analytics.tsx";
 import { Route, Routes, useLocation } from "react-router-dom";
+import { InfoScreen } from './InfoScreen';
 
 export enum ColorCodes {
   Good = "green",
@@ -40,6 +41,14 @@ export function App() {
 }
 
 function AppInner() {
+  const [showInfoScreen, setShowInfoScreen] = useState(()=> {
+    try {
+      const saved = localStorage.getItem('gameState')
+      return saved ? false : true
+    }catch{
+      return true
+    }
+  })
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
   const [neighborhoodsDict, setNeighborhoodsDict] = useState({});
   const [gameState, setGameState] = useState(()=>{
@@ -285,6 +294,7 @@ function AppInner() {
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
         <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
         <LoseScreen gaveUp={gaveUp} onClose={() => setGaveUp(false)} colorTracker={gameState.color_tracker} />
+        <InfoScreen showInfoScreen={showInfoScreen}onClose={() => setShowInfoScreen(false)} />
 
       </div>
       <div style ={{    width: window.innerWidth <= 820 ? "90%" : "40%"}}>
