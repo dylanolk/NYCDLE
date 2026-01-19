@@ -19,7 +19,6 @@ const emoji_dict = {
 
 export function LoseScreen({ gaveUp, onClose, colorTracker }: LoseScreenProps) {
     const [copied, setCopied] = useState(false)
-    console.log('colorTracker', colorTracker)
     const emoji_string = colorTracker.map((c) => emoji_dict[c]).join('')
     var text_to_copy = `I just finished today's burrow!\n${emoji_string}`
     const hint_counter = colorTracker.filter((c) => c == ColorCodes.Hint).length

@@ -35,7 +35,6 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
         const svg = d3.select(svgRef.current)
         const g = d3.select(gRef.current)
         const all_points = enabled_neighborhoods.map((neighborhood) => neighborhood.bbox).flat()
-        console.log(all_points)
         const x_coords = all_points.map((coord) => coord[0])
         const y_coords = all_points.map((coord) => coord[1])
 

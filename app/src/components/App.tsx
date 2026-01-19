@@ -42,16 +42,58 @@ export function App() {
 function AppInner() {
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
   const [neighborhoodsDict, setNeighborhoodsDict] = useState({});
-  const [gameState, setGameState] = useState({
-    neighborhoods_guessed: [],
-    color_tracker: [],
-    start_neighborhood_id: null,
-    end_neighborhood_id: null,
-    finished: false
+  const [gameState, setGameState] = useState(()=>{
+    try{
+      let date = new Date()
+      let day = date.getDate() + 1;
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+      let currentDate = `${day}-${month}-${year}`;
+      let saved = localStorage.getItem('gameState')
+
+      if(saved && (JSON.parse(saved)["date"] != currentDate)){
+        localStorage.clear();
+        saved=null;
+      }
+      return saved ? JSON.parse(saved): {
+        neighborhoods_guessed: [],
+        color_tracker: [],
+        start_neighborhood_id: null,
+        end_neighborhood_id: null,
+        finished: false
+      }
+    }catch{
+      return {
+        neighborhoods_guessed: [],
+        color_tracker: [],
+        start_neighborhood_id: null,
+        end_neighborhood_id: null,
+        finished: false
+      }
+    }
   })
   const [endScreenVisible, setEndScreenVisible] = useState(false);
   const [gaveUp, setGaveUp] = useState(false);
   const context = useContext(NeighborhoodsContext)
+
+  useEffect(() => {
+    if (!context.current) return;
+
+    if (gameState.finished) setAllEnabled();
+    if (gameState.finished) setEndScreenVisible(true);
+  
+    for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
+      const id = gameState.neighborhoods_guessed[i];
+      const color_code = gameState.color_tracker[i];
+      if (context.current[id]) {         // ✅ only call if exists
+        context.current[id].setColor(color_code);
+      }
+    }
+  }, [gameState, context.current]); 
+
+  useEffect(()=>{
+    localStorage.setItem("gameState", JSON.stringify(gameState))
+  }, [gameState]);
 
   const wrapperRef = useRef(null)
 
@@ -77,7 +119,10 @@ function AppInner() {
     if (isRouteDone(value)) {
       setEndScreenVisible(true);
       setAllEnabled();
-      setGameState({...gameState, finished: true});
+      setGameState({...gameState, finished: true,
+        neighborhoods_guessed: [...gameState.neighborhoods_guessed, value],
+        color_tracker: [...gameState.color_tracker, color_code]
+      });
     }
   }
 
@@ -148,7 +193,7 @@ function AppInner() {
     // DFS of neighborhoods (only checking ones that have been guessed)
     let stack = [gameState.start_neighborhood_id]
     const visited = new Set([gameState.start_neighborhood_id]);
-    const guessed = gameState.neighborhoods_guessed.concat([last_guess])
+    const guessed = gameState.neighborhoods_guessed.concat([last_guess, gameState.end_neighborhood_id])
 
     while (stack.length > 0) {
       const current = stack.pop()
@@ -224,6 +269,7 @@ function AppInner() {
     Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
   }
   function giveUp() {
+    if (gameState.finished) return;
     setGaveUp(true)
     setAllEnabled()
     setGameState({...gameState, finished: true});
@@ -297,12 +343,11 @@ function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict) {
       }
     }
     const end_neighborhood_id = end_candidates[Math.floor(rng() * end_candidates.length)]
-
     setGameState({
       ...prev,
       start_neighborhood_id: start_neighborhood_id,
       end_neighborhood_id: end_neighborhood_id,
-      neighborhoods_guessed: [end_neighborhood_id]
+      date: currentDate,
     })
   }
 }
