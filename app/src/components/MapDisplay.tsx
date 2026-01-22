@@ -3,6 +3,7 @@ import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
 import { Neighborhood } from "./Neighborhood";
 import svgPanZoom from 'svg-pan-zoom';
 import * as d3 from 'd3'
+import { COLORS } from "../constants";
 
 type NeighborhoodProps = {
     neighborhoods: [],
@@ -16,8 +17,7 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
 
     const styles = {
         box: {
-            border: '2px solid #333',
-            backgroundColor: 'white',
+            border: `2px solid ${COLORS.dark_blue}`,
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             aspectRatio: '4/3',
@@ -70,7 +70,7 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
     }
     return (
         <div style={styles.box}>
-            <svg ref={svgRef} style={{ width: '100%', height: '100%' }} >
+            <svg ref={svgRef} style={{ width: '100%', height: '100%', background: COLORS.lifted_background }} >
                 <g ref={gRef}>
                     {
                         neighborhoods.map((neighborhood) => <Neighborhood key={neighborhood.id} neighborhood={neighborhood} />)

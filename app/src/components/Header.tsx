@@ -1,70 +1,88 @@
+import React from 'react';
+import { Infinity, Info } from 'lucide-react';
+
 type HeaderProps = {
-    startNeighborhoodName: string;
-    endNeighborhoodName: string;
+    showPracticeMode: () => void;
+    showInfoScreen: () => void;
 };
 
-export function Header({
-    startNeighborhoodName,
-    endNeighborhoodName,
-}: HeaderProps) {
+export function Header({ showPracticeMode, showInfoScreen }: HeaderProps) {
     const containerStyle: React.CSSProperties = {
-        border: '2px solid #4A90E2',
-        borderRadius: '1rem',
-        padding: '.5rem 1rem',
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(180deg, #F9FBFF 0%, #F1F6FF 100%)',
-        boxSizing: 'border-box',
-        flexGrow: '1',
         display: 'flex',
-        flexDirection: 'column'
-    };
-    const wrapperStyle: React.CSSProperties = {
-        padding: '1rem 0rem',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0.5rem 1.5rem',
         width: '100%',
-        flex: '0 1',
-        display: 'flex'
-    }
+        background: '#191923 ',
+        borderBottom: '2px solid #0E79B2',
+        boxSizing: 'border-box',
+        height: '60px',
+        boxShadow: `
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.06)
+    `,
+    };
 
-    const titleStyle: React.CSSProperties = {
+    const logoStyle: React.CSSProperties = {
         fontFamily:
             '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-        fontSize: 'clamp(1rem, 1.5vw, 2.3rem)',
-        fontWeight: 500,
-        letterSpacing: '-0.015em',
-        lineHeight: 1.35,
-        color: '#1F2937',
+        fontWeight: 'bold',
+        fontSize: '1.5rem',
+        color: '#7FB685',
+        margin: 0,
+    };
+
+    const iconStyle: React.CSSProperties = {
+        cursor: 'pointer',
+        color: '#0E79B2',
+        width: '24px',
+        height: '24px',
+        transition: 'transform 0.2s ease',
+        padding: '5px'
+    };
+
+    const infinityContainerStyle: React.CSSProperties = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        border: '2px solid #0E79B2',
         maxWidth: '100%',
-        wordBreak: 'break-word',
-        textAlign: 'center'
+        maxHeight: '100%',
+        aspectRatio: "1/1",
+        borderRadius: '50%'
+    };
+    const infoContainerStyle: React.CSSProperties = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        maxWidth: '100%',
+        maxHeight: '100%',
+        aspectRatio: "1/1",
+    };
+
+    const infoStyle: React.CSSProperties = {
+        cursor: 'pointer',
+        color: '#0E79B2',
+        width: '100px',
+        height: '100px',
+        transition: 'transform 0.2s ease',
+        padding: '5px'
     }
 
-    const startStyle: React.CSSProperties = {
-        color: '#E58A8A', // pastel red
-        fontWeight: 700,
-    };
-
-    const endStyle: React.CSSProperties = {
-        color: '#7DA9E8', // pastel blue
-        fontWeight: 700,
-    };
-
-    const burrowStyle: React.CSSProperties = {
-        color: '#5f8d0aff', // pastel blue
-        fontWeight: 700,
-    };
 
     return (
-        <div style={wrapperStyle}>
-            <div style={containerStyle}>
-                <div style={titleStyle}>
-                    Today I want to < span style={burrowStyle} > burrow</span > from{' '}
-                    <span style={startStyle}>{startNeighborhoodName}</span>{' '}
-                    to{' '}
-                    <span style={endStyle}>{endNeighborhoodName}</span>
-                </div >
-            </div >
-        </div >
+        <header style={containerStyle}>
+
+            <div style={infinityContainerStyle} title="Practice Mode" onClick={showPracticeMode}>
+                <Infinity style={iconStyle} />
+            </div>
+
+
+            <h1 style={logoStyle}>burrow</h1>
+
+            <div style={infoContainerStyle} title="Info" onClick={showInfoScreen}>
+                <Info style={infoStyle} />
+            </div>
+        </header >
     );
 }

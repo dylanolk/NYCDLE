@@ -1,10 +1,20 @@
 body {
     overflow-y: auto;
-    
+
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     height: 100%;
-  }
+}
+
+
+html {
+    overflow-y: hidden;
+}
+
+body {
+    overflow-y: auto;
+}

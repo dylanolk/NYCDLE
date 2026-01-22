@@ -1,3 +1,4 @@
+import { COLORS } from "../constants";
 import { NeighborhoodsContext } from "../contexts/NeighborhoodsContext";
 import type { Neighborhood } from "../domains/Neighborhood";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -12,13 +13,13 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
 
     const context = useContext(NeighborhoodsContext);
     const [enabled, setEnabled] = useState(false);
-    const [color, setColor] = useState("lightgray");
+    const [color, setColor] = useState(COLORS.logo_color);
     const [showName, setShowName] = useState(false);
 
     const [hovered, setHovered] = useState(false);
     const [offset, setOffset] = useState(0);
 
-    const center_x = (neighborhood.bbox[0][0] + neighborhood.bbox[1][0])/2
+    const center_x = (neighborhood.bbox[0][0] + neighborhood.bbox[1][0]) / 2
     const top_y = neighborhood.bbox[1][1]
     const [center, setCenter] = useState({ x: center_x, y: top_y });
 
@@ -105,7 +106,7 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
 
             {/* 🔹 Auto-sized hover label */}
             {hovered && enabled && showName && (
-                <g transform={`translate(${center.x}, ${center.y-14})`}>
+                <g transform={`translate(${center.x}, ${center.y - 14})`}>
                     <rect
                         x={-(labelSize.width / 2) - 8}
                         y={-(labelSize.height / 2) - 6}

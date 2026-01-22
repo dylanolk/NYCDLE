@@ -1,6 +1,7 @@
 import Select from 'react-select'
 import { useRef, useState } from 'react'
 import { Search } from 'lucide-react'
+import { COLORS } from '../constants'
 
 type Neighborhood = {
     id: string | number
@@ -52,7 +53,7 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
             minHeight: 52,
             borderRadius: 18,
             background: '#fefcf9', // soft off-white, visible but gentle
-            border: state.isFocused ? '2px solid #d1a054' : '1px solid #e2d6c8', // subtle earthy accent
+            border: `2px solid ${COLORS.dark_blue}`, // subtle earthy accent
             boxShadow: state.isFocused
                 ? '0 0 0 4px rgba(209,160,84,0.2)'
                 : '0 4px 12px rgba(0,0,0,0.08)',
@@ -73,7 +74,7 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
 
         placeholder: (base: any) => ({
             ...base,
-            color: '#7c5e42', // subtle, readable
+            color: COLORS.dark_blue, // subtle, readable
             fontWeight: 500,
             fontSize: 16,
         }),
@@ -82,7 +83,7 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
             ...base,
             fontSize: 16,
             fontWeight: 600,
-            color: '#533f2e',
+            color: COLORS.dark_blue,
         }),
 
         menu: (base: any) => ({
@@ -95,12 +96,8 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
         option: (base: any, state: any) => ({
             ...base,
             padding: '12px 16px',
-            backgroundColor: state.isFocused
-                ? '#f6f2ed'
-                : state.isSelected
-                    ? '#ede3d7'
-                    : 'white',
-            color: '#533f2e',
+            backgroundColor: COLORS.lifted_background,
+            color: COLORS.dark_blue,
             cursor: 'pointer',
             fontWeight: state.isSelected ? 600 : 500,
         }),
@@ -118,14 +115,23 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
         IndicatorSeparator: () => null,
         IndicatorsContainer: ({ innerProps }: any) => (
             <div {...innerProps} style={{ display: 'flex', alignItems: 'center', paddingRight: 12 }}>
-                <Search size={18} color="#533f2e" />
+                <Search size={18} color={COLORS.dark_blue} />
             </div>
         ),
     }
 
+    const wrapper_style = {
+        width: '100%',
+        padding: '8px 0px',
+        marginBottom: '3rem',
+        fontFamily:
+            '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+
+    }
+
 
     return (
-        <div style={{ width: '100%', padding: '8px 0px', marginBottom: '3rem'}}>
+        <div style={wrapper_style}>
             <Select
                 ref={inputRef}
                 options={getSortedOptions()}

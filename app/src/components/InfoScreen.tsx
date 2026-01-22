@@ -79,7 +79,6 @@ export function InfoScreen({ showInfoScreen, onClose }: InfoScreenProps) {
                         'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
                 }}
             >
-                {/* Header */}
                 <DialogTitle
                     style={{
                         fontSize: T.text.title,
@@ -136,29 +135,29 @@ export function InfoScreen({ showInfoScreen, onClose }: InfoScreenProps) {
                         }}
                     >
                         <p style={{ marginBottom: T.space.xs }}>
-                            Connect the <span style = {{color: '#E58A8A', fontWeight: 700}}>starting neighborhood </span> 
-                            to the <span style ={{color:'#7DA9E8', fontWeight: 700}}> ending neighborhood </span>
+                            Connect the <span style={{ color: '#E58A8A', fontWeight: 700 }}>starting neighborhood </span>
+                            to the <span style={{ color: '#7DA9E8', fontWeight: 700 }}> ending neighborhood </span>
                             in as few moves as possible.
                         </p>
-                        <p> 
-                            Neighborhoods are colored <br/> <span style ={{color:'green', fontWeight: 700}}>green</span> if they get you closer,<br/>
-                            <span style ={{color:'orange', fontWeight: 700}}> orange </span> if you've got the right idea,<br/>  
-                            and <span style ={{color:'red', fontWeight: 700}}> red </span> if you weren't close.
+                        <p>
+                            Neighborhoods are colored <br /> <span style={{ color: 'green', fontWeight: 700 }}>green</span> if they get you closer,<br />
+                            <span style={{ color: 'orange', fontWeight: 700 }}> orange </span> if you've got the right idea,<br />
+                            and <span style={{ color: 'red', fontWeight: 700 }}> red </span> if you weren't close.
                         </p>
                     </Description>
 
                     {/* Sections */}
                     <Section title="What counts as a neighborhood?">
-                        <strong>There are no official neighborhood borders for NYC</strong> <br/>
-                        This means you might disagree with the borders as drawn. Please remember they are subjective and unofficial. <br/><br/>
-                        The data burrow uses is from <a href ='https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd/about_data' target = "_blank">Neighborhood Tabulation Areas</a> used for census reporting. <br/><br/>
-                        <i>Though NTA boundaries and their associated names roughly correspond with many neighborhoods commonly recognized by New Yorkers, NTAs are not intended to definitively represent neighborhoods, nor are they intended to be exhaustive of all possible names and understandings of neighborhoods throughout New York City.</i> <br/> <br/>
+                        <strong>There are no official neighborhood borders for NYC</strong> <br />
+                        This means you might disagree with the borders as drawn. Please remember they are subjective and unofficial. <br /><br />
+                        The data burrow uses is from <a href='https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd/about_data' target="_blank">Neighborhood Tabulation Areas</a> used for census reporting. <br /><br />
+                        <i>Though NTA boundaries and their associated names roughly correspond with many neighborhoods commonly recognized by New Yorkers, NTAs are not intended to definitively represent neighborhoods, nor are they intended to be exhaustive of all possible names and understandings of neighborhoods throughout New York City.</i> <br /> <br />
                         That said, some subjectivity is used. Neighborhoods that are connected by bridge or tunnel in real life should be considered bordering. If you find this is not the case you can contact me at burrow@dylanolk.com
                     </Section>
 
                     <Section title="Acknowledgements and credits">
-                        burrow is created by Dylan Olk. <br/> <br/>
-                        The game takes much inspiration by the wonderful <a href = "https://travle.earth" target = "_blank">travle.earth</a> by the talented Oisín Carroll and team. <br/><br/>
+                        burrow is created by Dylan Olk. <br /> <br />
+                        The game takes much inspiration by the wonderful <a href="https://travle.earth" target="_blank">travle.earth</a> by the talented Oisín Carroll and team. <br /><br />
 
                     </Section>
 

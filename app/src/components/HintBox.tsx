@@ -1,3 +1,5 @@
+import { COLORS } from "../constants";
+
 type HintBoxProps = {
     showNextNeighborhood: () => void;
     showAllOutlines: () => void;
@@ -11,33 +13,35 @@ export function HintBox({
 }: HintBoxProps) {
     const containerStyle: React.CSSProperties = {
         flex: 2,
-        border: '2px solid #4A90E2',
+        border: `2px solid ${COLORS.pale_blue}`,
         borderRadius: '10px',
-        padding: '3% 1% 3%',
+        padding: '3% 5% 3%',
         maxWidth: '100%',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
-        background: '#F9FBFF',
+        gap: '20px',
+        background: COLORS.lifted_background,
     };
 
     const buttonStyle: React.CSSProperties = {
         padding: '10px 14px',
         borderRadius: '8px',
-        border: '1px solid #4A90E2',
-        background: '#FFFFFF',
-        color: '#2C5FA8',
+        border: `1px solid ${COLORS.blue}`,
+        background: COLORS.lifted_background,
+        color: COLORS.blue,
         fontSize: '14px',
         fontWeight: 500,
         cursor: 'pointer',
         transition: 'background 0.15s ease, transform 0.05s ease',
+        fontFamily:
+            '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
     };
 
-    const dangerButtonStyle: React.CSSProperties = {
+    const give_up_button_style: React.CSSProperties = {
         ...buttonStyle,
-        border: '1px solid #E24A4A',
-        color: '#A82C2C',
-        background: '#FFF5F5',
+        border: `1px solid ${COLORS.deep_red}`,
+        color: COLORS.deep_red,
+        background: COLORS.lifted_background,
     };
 
     return (
@@ -57,7 +61,7 @@ export function HintBox({
             </button>
 
             <button
-                style={dangerButtonStyle}
+                style={give_up_button_style}
                 onClick={giveUp}
             >
                 Give Up

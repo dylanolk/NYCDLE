@@ -7,17 +7,19 @@ import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext.tsx';
 import { EndScreen } from './EndScreen.tsx';
 import seedrandom from "seedrandom";
 import { HintBox } from './HintBox.tsx';
-import { Header } from './Header.tsx';
+import { GoalBox } from './GoalBox.tsx';
 import { LoseScreen } from './LoseScreen.tsx';
 import { initGA, logPageView } from "../analytics.tsx";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { InfoScreen } from './InfoScreen';
+import { Header } from './Header.tsx';
+import { COLORS } from '../constants.tsx'
 
 export enum ColorCodes {
-  Good = "green",
+  Good = COLORS.logo_color,
   Close = "orange",
-  Bad = "red",
-  Hint = "grey",
+  Bad = COLORS.deep_red,
+  Hint = COLORS.dark_blue,
 }
 
 export function App() {
@@ -259,7 +261,7 @@ function AppInner() {
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.background_color,
     flexDirection: 'column',
     padding: 0,
     overflowY: 'auto'
@@ -291,8 +293,9 @@ function AppInner() {
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
   return (
     <div ref={wrapperRef} style={wrapper}>
+      <Header showInfoScreen={() => setShowInfoScreen(true)} />
       <div style={middle_div}>
-        <Header startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
+        <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
         <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
