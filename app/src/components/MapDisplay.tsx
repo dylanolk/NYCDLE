@@ -21,7 +21,8 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             aspectRatio: '4/3',
-            maxWidth: '100%'
+            boxSizing: 'border-box',
+            width: '100%'
         },
     };
     useEffect(() => {
@@ -65,7 +66,7 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
     }, [neighborhoods, enabled_neighborhoods_ids]);
 
     if (!neighborhoods || neighborhoods.length === 0) {
-        return <div>Loading...</div>;
+        return <div style={styles.box}>Loading...</div>;
     }
     return (
         <div style={styles.box}>
