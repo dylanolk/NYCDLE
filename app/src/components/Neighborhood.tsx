@@ -31,6 +31,13 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
         return () => delete context.current[neighborhood.id];
     }, []);
 
+    useEffect(() => {
+        if (neighborhood.polygons.length === 0) return;
+
+        const x_center = (neighborhood.bbox[0][0] + neighborhood.bbox[1][0]) / 2
+        const y_top = neighborhood.bbox[1][1]
+        setCenter({ x: x_center, y: y_top });
+    }, [neighborhood]);
 
     // 🔹 measure label text when it appears
     useEffect(() => {

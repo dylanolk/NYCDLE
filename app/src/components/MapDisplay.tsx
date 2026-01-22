@@ -21,15 +21,14 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
             borderRadius: '8px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             aspectRatio: '4/3',
-            width: '100%'
+            maxWidth: '100%'
         },
     };
     useEffect(() => {
         if (!enabled_neighborhoods_ids.length) return;
         if (!neighborhoods.length) return;
-        const svgEl = svgRef.current;
-        const gEl = gRef.current;
-        if (!svgEl || !gEl) return;
+
+        if (!svgRef.current || !gRef.current) return;
 
         const enabled_neighborhoods = neighborhoods.filter((neighborhood) => enabled_neighborhoods_ids.includes(neighborhood.id))
         const svg = d3.select(svgRef.current)

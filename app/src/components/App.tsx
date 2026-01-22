@@ -41,18 +41,18 @@ export function App() {
 }
 
 function AppInner() {
-  const [showInfoScreen, setShowInfoScreen] = useState(()=> {
+  const [showInfoScreen, setShowInfoScreen] = useState(() => {
     try {
       const saved = localStorage.getItem('gameState')
       return saved ? false : true
-    }catch{
+    } catch {
       return true
     }
   })
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
   const [neighborhoodsDict, setNeighborhoodsDict] = useState({});
-  const [gameState, setGameState] = useState(()=>{
-    try{
+  const [gameState, setGameState] = useState(() => {
+    try {
       let date = new Date()
       let day = date.getDate() + 1;
       let month = date.getMonth() + 1;
@@ -60,18 +60,18 @@ function AppInner() {
       let currentDate = `${day}-${month}-${year}`;
       let saved = localStorage.getItem('gameState')
 
-      if(saved && (JSON.parse(saved)["date"] != currentDate)){
+      if (saved && (JSON.parse(saved)["date"] != currentDate)) {
         localStorage.clear();
-        saved=null;
+        saved = null;
       }
-      return saved ? JSON.parse(saved): {
+      return saved ? JSON.parse(saved) : {
         neighborhoods_guessed: [],
         color_tracker: [],
         start_neighborhood_id: null,
         end_neighborhood_id: null,
         finished: false
       }
-    }catch{
+    } catch {
       return {
         neighborhoods_guessed: [],
         color_tracker: [],
@@ -90,19 +90,19 @@ function AppInner() {
 
     if (gameState.finished) setAllEnabled();
     if (gameState.finished) setEndScreenVisible(true);
-  
+
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
-      if (context.current[id]) {  
+      if (context.current[id]) {
         context.current[id].setColor(color_code);
         context.current[id].setEnabled(true);
         context.current[id].setShowName(true)
       }
     }
-  }, [gameState, context.current]); 
+  }, [gameState, context.current]);
 
-  useEffect(()=>{
+  useEffect(() => {
     localStorage.setItem("gameState", JSON.stringify(gameState))
   }, [gameState]);
 
@@ -130,7 +130,8 @@ function AppInner() {
     if (isRouteDone(value)) {
       setEndScreenVisible(true);
       setAllEnabled();
-      setGameState({...gameState, finished: true,
+      setGameState({
+        ...gameState, finished: true,
         neighborhoods_guessed: [...gameState.neighborhoods_guessed, value],
         color_tracker: [...gameState.color_tracker, color_code]
       });
@@ -254,7 +255,7 @@ function AppInner() {
   }, [neighborhoods, context, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
   const wrapper: CSSProperties = {
-    minHeight: '100svh',
+    height: '130svh',
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -265,11 +266,11 @@ function AppInner() {
   }
   const middle_div: CSSProperties = {
     width: window.innerWidth <= 820 ? "90%" : "40%",
-    height: '90%',
+    flex: 2,
     maxWidth: "1200px",
     display: "flex",
     flexDirection: "column",
-    alignItems: "stretch",
+    justifyContent: 'center',
   };
   function showNextNeighborhood() {
     const optimal_path = optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id)
@@ -283,7 +284,7 @@ function AppInner() {
     if (gameState.finished) return;
     setGaveUp(true)
     setAllEnabled()
-    setGameState({...gameState, finished: true});
+    setGameState({ ...gameState, finished: true });
   }
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
@@ -293,17 +294,14 @@ function AppInner() {
       <div style={middle_div}>
         <Header startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
-        <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} />
+        <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
         <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
         <LoseScreen gaveUp={gaveUp} onClose={() => setGaveUp(false)} colorTracker={gameState.color_tracker} />
-        <InfoScreen showInfoScreen={showInfoScreen}onClose={() => setShowInfoScreen(false)} />
-
+        <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
       </div>
-      <div style ={{    width: window.innerWidth <= 820 ? "90%" : "40%"}}>
+      <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>
         <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />
       </div>
-
-       
     </div>
   )
 

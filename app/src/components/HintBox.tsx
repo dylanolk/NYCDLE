@@ -14,7 +14,7 @@ export function HintBox({
         border: '2px solid #4A90E2',
         borderRadius: '10px',
         padding: '3% 1% 3%',
-        width: '100%',
+        maxWidth: '100%',
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',

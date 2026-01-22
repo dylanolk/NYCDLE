@@ -16,24 +16,29 @@ export function Header({
         alignItems: 'center',
         background: 'linear-gradient(180deg, #F9FBFF 0%, #F1F6FF 100%)',
         boxSizing: 'border-box',
+        flexGrow: '1',
+        display: 'flex',
+        flexDirection: 'column'
     };
     const wrapperStyle: React.CSSProperties = {
-        padding: '1rem 0rem', 
+        padding: '1rem 0rem',
         width: '100%',
+        flex: '0 1',
+        display: 'flex'
     }
 
     const titleStyle: React.CSSProperties = {
         fontFamily:
             '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-        fontSize: 'clamp(1rem, 1.2rem, 1.5rem)',
+        fontSize: 'clamp(1rem, 1.5vw, 2.3rem)',
         fontWeight: 500,
         letterSpacing: '-0.015em',
         lineHeight: 1.35,
         color: '#1F2937',
-        textAlign: 'center',
         maxWidth: '100%',
         wordBreak: 'break-word',
-    };
+        textAlign: 'center'
+    }
 
     const startStyle: React.CSSProperties = {
         color: '#E58A8A', // pastel red
@@ -54,12 +59,12 @@ export function Header({
         <div style={wrapperStyle}>
             <div style={containerStyle}>
                 <div style={titleStyle}>
-                    Today I want to <span style={burrowStyle}>burrow</span> from{' '}
+                    Today I want to < span style={burrowStyle} > burrow</span > from{' '}
                     <span style={startStyle}>{startNeighborhoodName}</span>{' '}
                     to{' '}
                     <span style={endStyle}>{endNeighborhoodName}</span>
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+        </div >
     );
 }
