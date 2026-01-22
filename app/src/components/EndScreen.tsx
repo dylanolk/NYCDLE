@@ -10,14 +10,13 @@ type EndScreenProps = {
     colorTracker: any
 }
 
-const emoji_dict = {
-    green: '🟩',
-    red: '🟥',
-    orange: '🟧',
-    grey: '⬜'
-}
-
 export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreenProps) {
+    const emoji_dict = {
+        [ColorCodes.Good]: '🟩',
+        [ColorCodes.Bad]: '🟥',
+        [ColorCodes.Close]: '🟧',
+        [ColorCodes.Hint]: '⬜'
+    }
     const [copied, setCopied] = useState(false)
     const emoji_string = colorTracker.map((c) => emoji_dict[c]).join('')
     var text_to_copy = `I just beat today's daily burrow!\n${emoji_string}`

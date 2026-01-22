@@ -13,7 +13,7 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
 
     const context = useContext(NeighborhoodsContext);
     const [enabled, setEnabled] = useState(false);
-    const [color, setColor] = useState(COLORS.logo_color);
+    const [color, setColor] = useState("lightgrey");
     const [showName, setShowName] = useState(false);
 
     const [hovered, setHovered] = useState(false);

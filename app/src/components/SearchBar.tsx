@@ -52,11 +52,8 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
             ...base,
             minHeight: 52,
             borderRadius: 18,
-            background: '#fefcf9', // soft off-white, visible but gentle
             border: `2px solid ${COLORS.dark_blue}`, // subtle earthy accent
-            boxShadow: state.isFocused
-                ? '0 0 0 4px rgba(209,160,84,0.2)'
-                : '0 4px 12px rgba(0,0,0,0.08)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             cursor: 'text',
             transition: 'all 0.2s ease',
             transform: state.isFocused ? 'scale(1.02)' : 'scale(1)',
