@@ -19,7 +19,7 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
         box: {
             border: `2px solid ${COLORS.dark_blue}`,
             borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.52)',
             aspectRatio: '4/3',
             boxSizing: 'border-box',
             width: '100%'
