@@ -26,6 +26,15 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
         },
     };
     useEffect(() => {
+        if (!svgRef.current || !gRef.current) return;
+        const svg = d3.select(svgRef.current)
+        const g = d3.select(gRef.current)
+        const zoom_behavior = d3.zoom().on('zoom', (event) => {
+            g.attr('transform', event.transform);
+        });
+        svg.call(zoom_behavior);
+    }, [neighborhoods, enabled_neighborhoods_ids]);
+    useEffect(() => {
         if (!enabled_neighborhoods_ids.length) return;
         if (!neighborhoods.length) return;
 

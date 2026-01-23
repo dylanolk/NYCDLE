@@ -37,12 +37,13 @@ export function App() {
     <NeighborhoodsContext.Provider value={registry}>
       <Routes>
         <Route path="/" element={<AppInner />} />
+        <Route path='/debug' element={<AppInner debug={true} />} />
       </Routes>
     </NeighborhoodsContext.Provider>
   )
 }
 
-function AppInner() {
+function AppInner({ debug }) {
   const [showInfoScreen, setShowInfoScreen] = useState(() => {
     try {
       const saved = localStorage.getItem('gameState')
@@ -71,7 +72,8 @@ function AppInner() {
         color_tracker: [],
         start_neighborhood_id: null,
         end_neighborhood_id: null,
-        finished: false
+        finished: false,
+        gave_up: false,
       }
     } catch {
       return {
@@ -79,20 +81,31 @@ function AppInner() {
         color_tracker: [],
         start_neighborhood_id: null,
         end_neighborhood_id: null,
-        finished: false
+        finished: false,
+        gave_up: false,
       }
     }
   })
   const [endScreenVisible, setEndScreenVisible] = useState(false);
-  const [gaveUp, setGaveUp] = useState(false);
+  const [showGaveUpScreen, setShowGaveUpScreen] = useState(false);
   const context = useContext(NeighborhoodsContext)
+
+  const savedGameStateApplied = useRef(false);
 
   useEffect(() => {
     if (!context.current) return;
-
+    // Wait for all guessed neighborhoods to be registered. 
+    if (!neighborhoods.length) return;
+    if (!neighborhoods.every(
+      n => context.current[n.id] !== undefined
+    )) {
+      return;
+    }
+    if (savedGameStateApplied.current) return;
     if (gameState.finished) setAllEnabled();
-    if (gameState.finished) setEndScreenVisible(true);
-
+    if (gameState.finished && !gameState.gave_up) setEndScreenVisible(true);
+    if (gameState.finished && gameState.gave_up) setShowGaveUpScreen(true);
+    console.log(gameState)
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
@@ -102,11 +115,43 @@ function AppInner() {
         context.current[id].setShowName(true)
       }
     }
+    savedGameStateApplied.current = true
   }, [gameState, context.current]);
 
   useEffect(() => {
     localStorage.setItem("gameState", JSON.stringify(gameState))
   }, [gameState]);
+  useEffect(() => {
+    fetchData(setNeighborhoods, setNeighborhoodsDict);
+  }, []
+  );
+
+  useEffect(() => {
+    if (!neighborhoods) {
+      return
+    }
+    randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict);
+  }, [neighborhoods]
+  );
+
+  // Color and enable start/end neighborhoods
+  useEffect(() => {
+    if (
+      neighborhoods.length === 0 ||
+      !context.current[gameState.start_neighborhood_id] ||
+      !context.current[gameState.end_neighborhood_id]
+    ) {
+      return;
+    }
+
+    context.current[gameState.start_neighborhood_id].setEnabled(true);
+    context.current[gameState.start_neighborhood_id].setColor('#E58A8A');
+    context.current[gameState.start_neighborhood_id].setShowName(true);
+    context.current[gameState.end_neighborhood_id].setEnabled(true);
+    context.current[gameState.end_neighborhood_id].setColor('#7DA9E8');
+    context.current[gameState.end_neighborhood_id].setShowName(true);
+
+  }, [neighborhoods, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
   const wrapperRef = useRef(null)
 
@@ -227,34 +272,7 @@ function AppInner() {
   }
 
 
-  useEffect(() => {
-    fetchData(setNeighborhoods, setNeighborhoodsDict);
-  }, []
-  );
 
-  useEffect(() => {
-    randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict);
-  }, [neighborhoods]
-  );
-
-
-  useEffect(() => {
-    if (
-      neighborhoods.length === 0 ||
-      !context.current[gameState.start_neighborhood_id] ||
-      !context.current[gameState.end_neighborhood_id]
-    ) {
-      return; // Wait until neighborhoods loaded and refs registered
-    }
-
-    context.current[gameState.start_neighborhood_id].setEnabled(true);
-    context.current[gameState.start_neighborhood_id].setColor('#E58A8A');
-    context.current[gameState.start_neighborhood_id].setShowName(true);
-    context.current[gameState.end_neighborhood_id].setEnabled(true);
-    context.current[gameState.end_neighborhood_id].setColor('#7DA9E8');
-    context.current[gameState.end_neighborhood_id].setShowName(true);
-
-  }, [neighborhoods, context, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
   const wrapper: CSSProperties = {
     height: '130svh',
@@ -284,13 +302,29 @@ function AppInner() {
   }
   function giveUp() {
     if (gameState.finished) return;
-    setGaveUp(true)
+    setShowGaveUpScreen(true)
     setAllEnabled()
-    setGameState({ ...gameState, finished: true });
+    setGameState({ ...gameState, finished: true, gave_up: true });
   }
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
+  if (debug) {
+    return (
+      <div ref={wrapperRef} style={wrapper}>
+        <Header showInfoScreen={() => setShowInfoScreen(true)} />
+        <div style={middle_div}>
+          <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
+          <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={[enabled_neighborhoods_ids]} />
+          <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
+          <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
+        </div>
+        <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>
+          <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />
+        </div>
+      </div>
+    )
+  }
   return (
     <div ref={wrapperRef} style={wrapper}>
       <Header showInfoScreen={() => setShowInfoScreen(true)} />
@@ -299,7 +333,7 @@ function AppInner() {
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
         <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
-        <LoseScreen gaveUp={gaveUp} onClose={() => setGaveUp(false)} colorTracker={gameState.color_tracker} />
+        <LoseScreen gaveUp={showGaveUpScreen} onClose={() => setShowGaveUpScreen(false)} colorTracker={gameState.color_tracker} />
         <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
       </div>
       <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>
