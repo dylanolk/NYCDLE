@@ -90,22 +90,28 @@ function AppInner({ debug }) {
   const [showGaveUpScreen, setShowGaveUpScreen] = useState(false);
   const context = useContext(NeighborhoodsContext)
 
-  const savedGameStateApplied = useRef(false);
 
+  // Load apply saved game state
+  const savedGameStateApplied = useRef(false);
   useEffect(() => {
+
     if (!context.current) return;
-    // Wait for all guessed neighborhoods to be registered. 
+    // Wait for all neighborhoods to be registered. 
     if (!neighborhoods.length) return;
     if (!neighborhoods.every(
       n => context.current[n.id] !== undefined
     )) {
       return;
     }
+    if (debug) {
+      setAllEnabled();
+      return;
+    }
     if (savedGameStateApplied.current) return;
     if (gameState.finished) setAllEnabled();
     if (gameState.finished && !gameState.gave_up) setEndScreenVisible(true);
     if (gameState.finished && gameState.gave_up) setShowGaveUpScreen(true);
-    console.log(gameState)
+
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
@@ -119,6 +125,7 @@ function AppInner({ debug }) {
   }, [gameState, context.current]);
 
   useEffect(() => {
+    if (debug) return;
     localStorage.setItem("gameState", JSON.stringify(gameState))
   }, [gameState]);
   useEffect(() => {
@@ -306,6 +313,16 @@ function AppInner({ debug }) {
     setAllEnabled()
     setGameState({ ...gameState, finished: true, gave_up: true });
   }
+  function red_neighborhoods(neighborhoods) {
+    for (var val in neighborhoods) {
+      context.current[neighborhoods[val]].setColor('red')
+    }
+  }
+  function grey_neighborhoods(neighborhoods) {
+    for (const val in neighborhoods) {
+      context.current[neighborhoods[val]].setColor('lightgrey')
+    }
+  }
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
@@ -315,7 +332,7 @@ function AppInner({ debug }) {
         <Header showInfoScreen={() => setShowInfoScreen(true)} />
         <div style={middle_div}>
           <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
-          <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={[enabled_neighborhoods_ids]} />
+          <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={neighborhoods.map(neighborhood => neighborhood.id)} onHover={red_neighborhoods} offHover={grey_neighborhoods} />
           <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
           <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
         </div>

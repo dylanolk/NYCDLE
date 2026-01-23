@@ -5,9 +5,11 @@ import { useContext, useEffect, useRef, useState } from "react";
 
 type NeighborhoodProps = {
     neighborhood: Neighborhood;
+    onHover: (id: number[]) => void;
+    offHover: (id: number[]) => void;
 };
 
-export function Neighborhood({ neighborhood }: NeighborhoodProps) {
+export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodProps) {
     // 🔹 typed ref
     const gRef = useRef<SVGGElement | null>(null);
 
@@ -80,8 +82,12 @@ export function Neighborhood({ neighborhood }: NeighborhoodProps) {
                 if (el && el.parentNode && el.parentNode.lastChild !== el) {
                     el.parentNode.appendChild(el); // bring to front
                 }
+                onHover(neighborhood.borders)
             }}
-            onMouseLeave={() => setHovered(false)}
+            onMouseLeave={() => {
+                setHovered(false)
+                offHover(neighborhood.borders)
+            }}
             style={{ cursor: "pointer" }}
             transform={`translate(0, ${offset})`}
         >

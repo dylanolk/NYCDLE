@@ -7,11 +7,13 @@ import { COLORS } from "../constants";
 
 type NeighborhoodProps = {
     neighborhoods: [],
-    enabled_neighborhoods_ids: number[]
+    enabled_neighborhoods_ids: number[],
+    onHover: (id: number[]) => void;
+    offHover: (id: number[]) => void;
 };
 
 
-export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: NeighborhoodProps) {
+export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids, onHover = (() => null), offHover = (() => null) }: NeighborhoodProps) {
     const svgRef = useRef(null);
     const gRef = useRef(null);
 
@@ -82,7 +84,7 @@ export function MapDisplay({ neighborhoods, enabled_neighborhoods_ids }: Neighbo
             <svg ref={svgRef} style={{ width: '100%', height: '100%', background: COLORS.lifted_background }} >
                 <g ref={gRef}>
                     {
-                        neighborhoods.map((neighborhood) => <Neighborhood key={neighborhood.id} neighborhood={neighborhood} />)
+                        neighborhoods.map((neighborhood) => <Neighborhood key={neighborhood.id} neighborhood={neighborhood} onHover={onHover} offHover={offHover} />)
                     }
                 </g>
             </svg>
