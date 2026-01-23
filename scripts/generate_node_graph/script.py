@@ -7,12 +7,28 @@ data = {}
 with open("app/public/coords.json", "r") as file:
     data = json.load(file)
 
+_MANUAL_NEIGHBORHOOD_BORDERS: list[list[str]] = [
+    ["Fort Wadsworth", "Fort Hamilton", "Bay Ridge"] # Verrazzano-Narrows Bridge
+]
+
+
+
 neighborhoods: list[Neighborhood] = NeighborhoodSchema().load(data, many=True)
+neighborhood_name_dict: dict[str, Neighborhood] = {}
+
+def get_manual_borders(neighborhood, borders) -> list[int]:
+    for border in borders:
+        if neighborhood.name in border:
+            return [neighborhood_name_dict[name] for name in border if name != neighborhood.name]
+    return []
+
 for i, neighborhood in enumerate(neighborhoods):
     neighborhood.id = i
+    neighborhood_name_dict[neighborhood.name] = neighborhood.id
 
 for neighborhood in neighborhoods:
-    borders: list[int] = []
+    borders: list[int] = get_manual_borders(neighborhood, _MANUAL_NEIGHBORHOOD_BORDERS)
+    
     all_coords_a = [
         (round(coord.lat, 5), round(coord.lon, 5))
         for group in neighborhood.geometry.coordinates

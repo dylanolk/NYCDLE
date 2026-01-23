@@ -2,13 +2,15 @@ from scripts.get_neighborhood_data.nyc_data_schemas import NeighborhoodSchema
 from domain import Neighborhood
 from requests import get
 from math import tan, pi, log, radians
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import json
 
 data = get("https://data.cityofnewyork.us/resource/9nt8-h7nd.json")
 
 neighborhoods: list[Neighborhood] = NeighborhoodSchema().load(data.json(), many=True)
-
+_NEIGHBORHOODS_TO_MERGE = {
+    "Astoria-Ditmars-Steinway-Woodside":["Old Astoria-Hallets Point"] # Old astoria is not really a separate neighborhood
+}
 
 def mercator(lon, lat):
     """
@@ -117,9 +119,29 @@ def merge_like_neighborhoods(neighborhoods: list[Neighborhood]):
                     del neighborhoods_dict[key]
             else:
                 neighborhoods_dict[name_tuple] = neighborhood
+    return_dict: dict[str, Neighborhood] = {}
     for k in neighborhoods_dict.keys():
         neighborhoods_dict[k].name = "-".join(k)
-    return neighborhoods_dict.values()
+        return_dict[neighborhoods_dict[k].name] = neighborhoods_dict[k]
+    return return_dict
+
+def manual_merge_neighborhoods(neighborhoods_dict: dict[str,Neighborhood]):
+    return_dict: dict[str,Neighborhood] = dict(neighborhoods_dict)
+    for neighborhood in neighborhoods_dict.values():
+        if neighborhood.name in _NEIGHBORHOODS_TO_MERGE:
+            combined_neighborhood = replace(neighborhood)
+            new_key = neighborhood.name
+            for neighbor_name in _NEIGHBORHOODS_TO_MERGE[neighborhood.name]:
+                neighbor=neighborhoods_dict[neighbor_name]
+                combined_neighborhood.polygons += neighbor.polygons
+                combined_neighborhood.geometry.coordinates += neighbor.geometry.coordinates
+                new_key += '-' + neighbor.name
+                del return_dict[neighbor.name]
+            return_dict[new_key] = combined_neighborhood
+            return_dict[new_key].name = new_key
+            del return_dict[neighborhood.name]
+    return return_dict
+            
 
 
 def find_dict_entry(dict: dict, tuple: tuple, neighborhood: Neighborhood):
@@ -134,7 +156,9 @@ neighborhoods = [populate_polygons(neighborhood) for neighborhood in neighborhoo
 
 neighborhoods = project_polygons_to_screen(neighborhoods, 1920, 1080)
 
-neighborhoods = merge_like_neighborhoods(neighborhoods)
+neighborhoods_dict = merge_like_neighborhoods(neighborhoods)
+
+neighborhoods = manual_merge_neighborhoods(neighborhoods_dict).values()
 
 
 with open("app/public/coords.json", "w") as file:
