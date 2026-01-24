@@ -4,9 +4,10 @@ import { Infinity, Info } from 'lucide-react';
 type HeaderProps = {
     showPracticeMode: () => void;
     showInfoScreen: () => void;
+    showHome: () => void;
 };
 
-export function Header({ showPracticeMode, showInfoScreen }: HeaderProps) {
+export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderProps) {
     const containerStyle: React.CSSProperties = {
         display: 'flex',
         alignItems: 'center',
@@ -78,7 +79,7 @@ export function Header({ showPracticeMode, showInfoScreen }: HeaderProps) {
             </div>
 
 
-            <h1 style={logoStyle}>burrow</h1>
+            <h1 style={logoStyle} onClick={showHome}>burrow</h1>
 
             <div style={infoContainerStyle} title="Info" onClick={showInfoScreen}>
                 <Info style={infoStyle} />
