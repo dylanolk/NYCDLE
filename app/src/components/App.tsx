@@ -363,7 +363,12 @@ function AppInner({ debug = false, practice = false }) {
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
         <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
-        <EndScreen endScreenVisible={endScreenVisible} onClose={() => setEndScreenVisible(false)} colorTracker={gameState.color_tracker} />
+        <EndScreen
+          endScreenVisible={endScreenVisible}
+          onClose={() => setEndScreenVisible(false)}
+          colorTracker={gameState.color_tracker}
+
+        />
         <LoseScreen gaveUp={showGaveUpScreen} onClose={() => setShowGaveUpScreen(false)} colorTracker={gameState.color_tracker} />
         <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
       </div>

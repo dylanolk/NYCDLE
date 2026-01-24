@@ -3,11 +3,42 @@ import React, { useEffect, useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { ColorCodes } from './App'
+import { COLORS } from '../constants'
 
 type EndScreenProps = {
     endScreenVisible: boolean
     onClose: () => void
     colorTracker: any
+}
+
+const T = {
+    space: {
+        xs: '0.5rem',
+        sm: '0.75rem',
+        md: '1rem',
+        lg: '1.375rem',
+        xl: '1.75rem',
+    },
+    text: {
+        body: '0.875rem',
+        section: '0.8125rem',
+        title: '1.625rem',
+    },
+    radius: {
+        sm: '10px',
+        md: '14px',
+        lg: '20px',
+    },
+    color: {
+        bgTop: '#fffaf2',
+        bgBottom: '#f6efe6',
+        cardTop: '#ffffff',
+        cardBottom: '#f0ebe4',
+        textPrimary: COLORS.lifted_background,
+        textSecondary: COLORS.lifted_background,
+        accent: '#e14b4b',
+        accentAlt: '#3b8ea5',
+    },
 }
 
 export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreenProps) {
@@ -38,80 +69,99 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
                     inset: 0,
                     background: 'rgba(0,0,0,0.4)',
                     backdropFilter: 'blur(4px)',
+
+
                 }}
             />
-
-            <DialogPanel
+            <div
                 style={{
                     position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '360px',
-                    background: 'linear-gradient(135deg, #ffffff, #f1f5f9)',
-                    padding: '28px',
-                    borderRadius: '18px',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                    textAlign: 'center',
+                    inset: 0,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '1.25rem',
+                    fontFamily:
+                        '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
                 }}
             >
-                <DialogTitle style={{ fontSize: '28px', fontWeight: 800 }}>
-                    🎉 You Did It!
-                </DialogTitle>
 
-                <Description style={{ color: '#555', marginBottom: '16px' }}>
-                    You completed today’s burrow!
-                </Description>
-
-                <div
+                <DialogPanel
                     style={{
-                        fontSize: '26px',
-                        padding: '10px 14px',
-                        background: '#fff',
-                        borderRadius: '10px',
-                        boxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
-                        marginBottom: '20px',
-                    }}
-                >
-                    {emoji_string}
-                </div>
-
-                <button
-                    onClick={handleCopy}
-                    style={{
-                        width: '100%',
-                        padding: '12px',
-                        borderRadius: '12px',
-                        border: 'none',
-                        background: '#111',
-                        color: 'white',
-                        fontWeight: 600,
+                        width: window.innerWidth <= 820 ? "90%" : "30%",
+                        maxHeight: '80vh',
+                        padding: T.space.lg,
+                        borderRadius: T.radius.lg,
+                        background: COLORS.dark_blue,
                         display: 'flex',
+                        flexDirection: 'column',
+                        boxShadow: '0 30px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        cursor: 'pointer',
-                        marginBottom: '10px',
-                    }}
-                >
-                    {copied ? <Check size={18} color="#4ade80" /> : <Copy size={18} />}
-                    {copied ? 'Copied!' : 'Copy Results'}
-                </button>
 
-                <button
-                    onClick={onClose}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: '12px',
-                        border: '1px solid #ccc',
-                        background: '#fff',
-                        cursor: 'pointer',
                     }}
                 >
-                    Close
-                </button>
-            </DialogPanel>
+                    <DialogTitle style={{ color: COLORS.lifted_background, fontSize: '28px', fontWeight: 800 }}>
+                        🎉 You Did It!
+                    </DialogTitle>
+
+                    <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
+                        You completed today’s burrow!
+                    </Description>
+
+                    <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
+                        You completed today’s burrow!
+                    </Description>
+
+                    <div
+                        style={{
+                            fontSize: '26px',
+                            padding: '10px 14px',
+                            background: '#fff',
+                            borderRadius: '10px',
+                            boxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
+                            marginBottom: '20px',
+                        }}
+                    >
+                        {emoji_string}
+                    </div>
+
+                    <button
+                        onClick={handleCopy}
+                        style={{
+                            width: '100%',
+                            padding: '12px',
+                            borderRadius: '12px',
+                            border: 'none',
+                            background: '#111',
+                            color: 'white',
+                            fontWeight: 600,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            cursor: 'pointer',
+                            marginBottom: '10px',
+                        }}
+                    >
+                        {copied ? <Check size={18} color="#4ade80" /> : <Copy size={18} />}
+                        {copied ? 'Copied!' : 'Copy Results'}
+                    </button>
+
+                    <button
+                        onClick={onClose}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: '12px',
+                            border: '1px solid #ccc',
+                            background: '#fff',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Close
+                    </button>
+                </DialogPanel>
+            </div>
         </Dialog>
     )
 }
