@@ -88,7 +88,7 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
                 setHovered(false)
                 offHover(neighborhood.borders)
             }}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: enabled ? "pointer" : "auto" }}
             transform={`translate(0, ${offset})`}
         >
             {neighborhood.polygons.map((polygon: any[], j: number) => (

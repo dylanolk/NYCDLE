@@ -141,6 +141,7 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
                 placeholder="Search neighborhoods…"
                 styles={selectStyles}
                 onMenuOpen={() => clear()}
+                onInputChange={(val) => setInputValue(val)}
                 onChange={(option) => {
                     setValue(option)
                     if (option) addNeighborhood(option.value)

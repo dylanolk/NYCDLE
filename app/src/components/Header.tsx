@@ -31,6 +31,7 @@ export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderPro
         fontSize: '1.5rem',
         color: '#7FB685',
         margin: 0,
+        cursor: 'pointer'
     };
 
     const iconStyle: React.CSSProperties = {
