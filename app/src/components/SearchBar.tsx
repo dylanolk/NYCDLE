@@ -17,6 +17,7 @@ type SearchBarProps = {
 export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: SearchBarProps) {
     const [value, setValue] = useState<{ value: string | number; label: string } | null>(null)
     const [inputValue, setInputValue] = useState('')
+    const [refresh, setRefresh] = useState(1)
 
     const inputRef = useRef(null);
 
@@ -126,31 +127,25 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
 
     }
 
+    const clear = () => {
+        inputRef.current.clearValue();
+    };
 
     return (
         <div style={wrapper_style}>
             <Select
+                key={refresh}
                 ref={inputRef}
                 options={getSortedOptions()}
-                value={value}
                 isClearable
                 placeholder="Search neighborhoods…"
                 styles={selectStyles}
-                inputValue={inputValue}
-                onFocus={() => {
-                    setTimeout(() => {
-                        wrapperRef.current?.scrollTo({
-                            top: wrapperRef.current.scrollHeight,
-                            behavior: 'smooth',
-                        });
-                    }, 300);
-                }}
-                components={customComponents}
-                onInputChange={(val) => setInputValue(val)}
+                onMenuOpen={() => clear()}
                 onChange={(option) => {
                     setValue(option)
                     if (option) addNeighborhood(option.value)
                 }}
+                menuShouldScrollIntoView
             />
         </div>
     )
