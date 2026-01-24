@@ -371,7 +371,14 @@ function AppInner({ debug = false, practice = false }) {
           optimalRoute={Object.keys(neighborhoodsDict).length ? optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id, true) : []}
 
         />
-        <LoseScreen gaveUp={showGaveUpScreen} onClose={() => setShowGaveUpScreen(false)} colorTracker={gameState.color_tracker} />
+        <LoseScreen
+          showGaveUpScreen={showGaveUpScreen}
+          onClose={() => setShowGaveUpScreen(false)}
+          gameState={gameState}
+          neighborhoodsDict={neighborhoodsDict}
+          optimalRoute={Object.keys(neighborhoodsDict).length ? optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id, true) : []}
+
+        />
         <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
       </div>
       <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>

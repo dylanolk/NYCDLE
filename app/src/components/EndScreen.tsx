@@ -177,8 +177,7 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                     >
                         Close
                     </button>
-                    {console.log(gameState.neighborhoods_guessed, optimalRoute)}
-                    {gameState.neighborhoods_guessed.length == optimalRoute.length ?
+                    {gameState.neighborhoods_guessed.length != optimalRoute.length - 1 ?
                         (<Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
                             You could've done: <span style={{ color: COLORS.deep_red }}>
                                 {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
