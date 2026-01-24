@@ -11,6 +11,7 @@ type EndScreenProps = {
     gameState: any
     neighborhoodsDict: any
     optimalRoute: number[]
+    practice: boolean
 }
 
 const T = {
@@ -43,7 +44,7 @@ const T = {
     },
 }
 
-export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsDict, optimalRoute }: EndScreenProps) {
+export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsDict, optimalRoute, practice }: EndScreenProps) {
     const emoji_dict = {
         [ColorCodes.Good]: '🟩',
         [ColorCodes.Bad]: '🟥',
@@ -51,11 +52,25 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
         [ColorCodes.Hint]: '⬜'
     }
     const [copied, setCopied] = useState(false)
-    const emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
-    var text_to_copy = `I just beat today's daily burrow!\n${emoji_string}`
-    const hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length
-    if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hints!`
-    text_to_copy += "\nburrow.dylanolk.com"
+    var emoji_string = ""
+    var text_to_copy = ""
+    var hint_counter = 0
+    if (!gameState.gave_up) {
+        emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
+        text_to_copy = "I just beat" + (!practice ? " today's daily burrow!" : ` a practice burrow from ${neighborhoodsDict[gameState.start_neighborhood_id]?.name} to ${neighborhoodsDict[gameState.end_neighborhood_id]?.name}`)
+        hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length
+        if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hints!`
+        text_to_copy += "\nburrow.dylanolk.com"
+    }
+    else {
+        emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
+        text_to_copy = `I just finished today's daily burrow!\n${emoji_string}`
+        hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length
+        if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hints!`
+        if (gameState.color_tracker.length) text_to_copy += "\n...and then I gave up!"
+        else text_to_copy += "\n...I didn't even try!"
+        text_to_copy += "\nburrow.dylanolk.com"
+    }
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(text_to_copy)
@@ -102,11 +117,11 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                     }}
                 >
                     <DialogTitle style={{ color: COLORS.lifted_background, fontSize: '28px', fontWeight: 800 }}>
-                        🎉 You Did It!
+                        {gameState.gave_up ? "Better luck next time" : "🎉 You Did It!"}
                     </DialogTitle>
 
                     <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
-                        You completed today’s burrow!
+                        {(gameState.gave_up ? "You gave up on" : "You completed") + (!practice ? " today's burrow!" : " a practice burrow!")}
                     </Description>
 
                     <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
@@ -123,9 +138,11 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                                 </span>
                             ))
                         ) : null}
-                        <span style={{ color: COLORS.blue }}>
-                            {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.end_neighborhood_id]?.name : null}
-                        </span>
+                        {gameState.gave_up ? <span>(Then you gave up)</span> :
+                            <span style={{ color: COLORS.blue }}>
+                                {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.end_neighborhood_id]?.name : null}
+                            </span>
+                        }
                     </Description>
 
 

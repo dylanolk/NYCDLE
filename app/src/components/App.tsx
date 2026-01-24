@@ -89,7 +89,6 @@ function AppInner({ debug = false, practice = false }) {
     }
   })
   const [endScreenVisible, setEndScreenVisible] = useState(false);
-  const [showGaveUpScreen, setShowGaveUpScreen] = useState(false);
   const context = useContext(NeighborhoodsContext)
 
   // Load apply saved game state
@@ -116,8 +115,8 @@ function AppInner({ debug = false, practice = false }) {
       return;
     }
     if (gameState.finished) setAllEnabled();
-    if (gameState.finished && !gameState.gave_up) setEndScreenVisible(true);
-    if (gameState.finished && gameState.gave_up) setShowGaveUpScreen(true);
+    if (gameState.finished) setEndScreenVisible(true);
+
 
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
@@ -322,7 +321,7 @@ function AppInner({ debug = false, practice = false }) {
   }
   function giveUp() {
     if (gameState.finished) return;
-    setShowGaveUpScreen(true)
+    setEndScreenVisible(true)
     setAllEnabled()
     setGameState({ ...gameState, finished: true, gave_up: true });
   }
@@ -369,15 +368,7 @@ function AppInner({ debug = false, practice = false }) {
           gameState={gameState}
           neighborhoodsDict={neighborhoodsDict}
           optimalRoute={Object.keys(neighborhoodsDict).length ? optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id, true) : []}
-
-        />
-        <LoseScreen
-          showGaveUpScreen={showGaveUpScreen}
-          onClose={() => setShowGaveUpScreen(false)}
-          gameState={gameState}
-          neighborhoodsDict={neighborhoodsDict}
-          optimalRoute={Object.keys(neighborhoodsDict).length ? optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id, true) : []}
-
+          practice={practice}
         />
         <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
       </div>
