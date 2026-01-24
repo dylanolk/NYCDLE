@@ -216,7 +216,7 @@ function AppInner({ debug = false, practice = false }) {
     return ColorCodes.Good
   }
 
-  function optimalDistance(id_1, id_2) {
+  function optimalDistance(id_1, id_2, include_guessed = false) {
     if (id_1 === id_2) return [id_1];
 
     let dequeue = [{ id: id_1, path: [] }];
@@ -230,7 +230,7 @@ function AppInner({ debug = false, practice = false }) {
         if (visited.has(neighbor_id)) continue;
 
         let newPath = [];
-        if (!gameState.neighborhoods_guessed.includes(neighbor_id)) {
+        if (!gameState.neighborhoods_guessed.includes(neighbor_id) || include_guessed) {
           newPath = [...path, neighbor_id];
           dequeue.push({
             id: neighbor_id,
@@ -366,7 +366,9 @@ function AppInner({ debug = false, practice = false }) {
         <EndScreen
           endScreenVisible={endScreenVisible}
           onClose={() => setEndScreenVisible(false)}
-          colorTracker={gameState.color_tracker}
+          gameState={gameState}
+          neighborhoodsDict={neighborhoodsDict}
+          optimalRoute={Object.keys(neighborhoodsDict).length ? optimalDistance(gameState.start_neighborhood_id, gameState.end_neighborhood_id, true) : []}
 
         />
         <LoseScreen gaveUp={showGaveUpScreen} onClose={() => setShowGaveUpScreen(false)} colorTracker={gameState.color_tracker} />

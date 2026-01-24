@@ -8,7 +8,9 @@ import { COLORS } from '../constants'
 type EndScreenProps = {
     endScreenVisible: boolean
     onClose: () => void
-    colorTracker: any
+    gameState: any
+    neighborhoodsDict: any
+    optimalRoute: number[]
 }
 
 const T = {
@@ -41,7 +43,7 @@ const T = {
     },
 }
 
-export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreenProps) {
+export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsDict, optimalRoute }: EndScreenProps) {
     const emoji_dict = {
         [ColorCodes.Good]: '🟩',
         [ColorCodes.Bad]: '🟥',
@@ -49,9 +51,9 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
         [ColorCodes.Hint]: '⬜'
     }
     const [copied, setCopied] = useState(false)
-    const emoji_string = colorTracker.map((c) => emoji_dict[c]).join('')
+    const emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
     var text_to_copy = `I just beat today's daily burrow!\n${emoji_string}`
-    const hint_counter = colorTracker.filter((c) => c == ColorCodes.Hint).length
+    const hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length
     if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hints!`
     text_to_copy += "\nburrow.dylanolk.com"
 
@@ -60,7 +62,6 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
     }
-
     return (
         <Dialog open={endScreenVisible} onClose={onClose}>
             <div
@@ -109,8 +110,24 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
                     </Description>
 
                     <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
-                        You completed today’s burrow!
+                        Your route: <span style={{ color: COLORS.deep_red }}>
+                            {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
+                        </span>
+
+                        {Object.keys(neighborhoodsDict).length ? (
+                            gameState.neighborhoods_guessed.map((id, index) => (
+                                <span>
+                                    <span key={index} style={{ color: gameState.color_tracker[index] == ColorCodes.Hint ? COLORS.background_color : gameState.color_tracker[index] }}>
+                                        {neighborhoodsDict[id].name + ' → '}
+                                    </span>
+                                </span>
+                            ))
+                        ) : null}
+                        <span style={{ color: COLORS.blue }}>
+                            {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.end_neighborhood_id]?.name : null}
+                        </span>
                     </Description>
+
 
                     <div
                         style={{
@@ -160,8 +177,31 @@ export function EndScreen({ endScreenVisible, onClose, colorTracker }: EndScreen
                     >
                         Close
                     </button>
+                    {console.log(gameState.neighborhoods_guessed, optimalRoute)}
+                    {gameState.neighborhoods_guessed.length == optimalRoute.length ?
+                        (<Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
+                            You could've done: <span style={{ color: COLORS.deep_red }}>
+                                {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
+                            </span>
+
+                            {Object.keys(neighborhoodsDict).length ? (
+                                optimalRoute.map((id, index) => (
+                                    index < optimalRoute.length - 1 ? (<span>
+                                        <span key={index} style={{ color: COLORS.logo_color }}>
+                                            {neighborhoodsDict[id].name + ' → '}
+                                        </span>
+                                    </span>) : <span key={index}></span>
+                                ))
+                            ) : null}
+
+                            <span style={{ color: COLORS.blue }}>
+                                {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.end_neighborhood_id]?.name : null}
+                            </span>
+                        </Description>) : null
+                    }
+
                 </DialogPanel>
             </div>
-        </Dialog>
+        </Dialog >
     )
 }
