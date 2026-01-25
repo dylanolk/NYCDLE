@@ -171,6 +171,7 @@ function AppInner({ debug = false, practice = false }) {
   const wrapperRef = useRef(null)
 
   function addNeighborhood(value, is_hint = false) {
+    if (gameState.neighborhoods_guessed.includes(value)) return;
     if (gameState.finished) return;
     if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
       return
