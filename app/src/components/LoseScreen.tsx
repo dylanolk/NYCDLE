@@ -178,7 +178,6 @@ export function LoseScreen({ showGaveUpScreen, onClose, gameState, neighborhoods
                     >
                         Close
                     </button>
-                    {console.log(gameState.neighborhoods_guessed, optimalRoute)}
                     {gameState.neighborhoods_guessed.length != optimalRoute.length - 1 ?
                         (<Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
                             You could've done: <span style={{ color: COLORS.deep_red }}>

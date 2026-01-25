@@ -13,7 +13,7 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
     // 🔹 typed ref
     const gRef = useRef<SVGGElement | null>(null);
 
-    const context = useContext(NeighborhoodsContext);
+    const {registry, reset_registry} = useContext(NeighborhoodsContext);
     const [enabled, setEnabled] = useState(false);
     const [color, setColor] = useState("lightgrey");
     const [showName, setShowName] = useState(false);
@@ -30,13 +30,13 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
     const [labelSize, setLabelSize] = useState({ width: 0, height: 0 });
 
     useEffect(() => {
-        context.current[neighborhood.id] = {
+        registry[neighborhood.id] = {
             setEnabled,
             setColor,
             setShowName,
             setGreyedOut,   
         };
-        return () => delete context.current[neighborhood.id];
+        return () => delete registry[neighborhood.id];
     }, []);
     
 

@@ -2,35 +2,18 @@ import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { useState } from 'react'
 import { COLORS } from '../constants'
 
-const BOROS = [
-    'boroname1',
-    'boroname2',
-    'boroname3',
-    'boroname4',
-    'boroname5',
-]
-
-export function PracticeSettings({ setEnabledBoros, onClose, showPracticeSettings }) {
-    const [enabled, setEnabled] = useState<Record<string, boolean>>(
-        BOROS.reduce((acc, name) => {
-            acc[name] = true
-            return acc
-        }, {} as Record<string, boolean>)
-    )
+export function PracticeSettings({ setEnabledBoros, onClose, showPracticeSettings, boroNames, practiceSettings }) {
+    const [enabled, setEnabled] = useState(Array.from(practiceSettings.enabled_boros))
 
     const toggle = (name: string) => {
-        setEnabled(prev => ({
-            ...prev,
-            [name]: !prev[name],
-        }))
+        if(enabled.includes(name)){
+            setEnabled(enabled.filter(n => n != name))
+        }
+        else setEnabled([...enabled, name])
     }
 
     const handleSubmit = () => {
-        const enabledList = Object.entries(enabled)
-            .filter(([_, v]) => v)
-            .map(([k]) => k)
-        console.log(enabledList)
-        setEnabledBoros(enabledList)
+        setEnabledBoros(enabled)
         onClose()
     }
 
@@ -97,8 +80,8 @@ export function PracticeSettings({ setEnabledBoros, onClose, showPracticeSetting
         fontWeight: 700
     }}> Enabled Boroughs </span>
     </div>
-    {BOROS.map(name => {
-        const isOn = enabled[name]
+    {boroNames.map(name => {
+        const isOn = enabled.includes(name)
 
         return (
             <label

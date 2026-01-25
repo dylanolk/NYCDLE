@@ -26,6 +26,7 @@ export enum ColorCodes {
 }
 
 export function App() {
+  const[registry, setRegistry] = useState({})
   const location = useLocation();
 
   useEffect(() => {
@@ -35,17 +36,31 @@ export function App() {
   useEffect(() => {
     logPageView(location.pathname);
   }, [location]);
-  const registry = useRef({});
+
+  function reset(){
+    setRegistry({})
+  }
+  
   return (
-    <NeighborhoodsContext.Provider value={registry}>
+    <NeighborhoodsContext.Provider value={{registry, reset}}>
       <Routes>
-        <Route path="/" element={<AppInner key={new Date().getTime()} />} />
-        <Route path='/debug' element={<AppInner debug={true} key={new Date().getTime()} />} />
-        <Route path='/practice' element={<AppInner practice={true} key={new Date().getTime()} />} />
+        <Route path="/" element={<AppInner key ={new Date().getTime()}/>} />
+        <Route path='/debug' element={<AppInner debug={true}/>} />
+        <Route path='/practice' element={<AppInner practice={true}/>} />
       </Routes>
     </NeighborhoodsContext.Provider>
   )
 }
+
+const _INITIAL_GAME_STATE ={
+        neighborhoods_guessed: [],
+        color_tracker: [],
+        start_neighborhood_id: null,
+        end_neighborhood_id: null,
+        finished: false,
+        gave_up: false,
+        showed_outlines: false, 
+      }
 
 function AppInner({ debug = false, practice = false }) {
   const navigate = useNavigate();
@@ -61,6 +76,9 @@ function AppInner({ debug = false, practice = false }) {
   const [endScreenVisible, setEndScreenVisible] = useState(false);
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
   const [neighborhoodsDict, setNeighborhoodsDict] = useState({});
+  const [practiceSettings, setPracticeSettings] = useState({
+    enabled_boros: []
+  })
   const [gameState, setGameState] = useState(() => {
     try {
       let date = new Date()
@@ -74,38 +92,34 @@ function AppInner({ debug = false, practice = false }) {
         localStorage.clear();
         saved = null;
       }
-      return saved && !practice ? JSON.parse(saved) : {
-        neighborhoods_guessed: [],
-        color_tracker: [],
-        start_neighborhood_id: null,
-        end_neighborhood_id: null,
-        finished: false,
-        gave_up: false,
-        showed_outlines: false,
-      }
+      return saved && !practice ? JSON.parse(saved) : _INITIAL_GAME_STATE
     } catch {
-      return {
-        neighborhoods_guessed: [],
-        color_tracker: [],
-        start_neighborhood_id: null,
-        end_neighborhood_id: null,
-        finished: false,
-        gave_up: false,
-        showed_outlines: false, 
-      }
+      return _INITIAL_GAME_STATE
     }
   })
-  const context = useContext(NeighborhoodsContext)
+  const {registry, reset_registry} = useContext(NeighborhoodsContext)
+
+  function resetGame() { 
+    Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(false))
+    Object.values(registry).forEach(neighborhood => neighborhood.setColor("lightgrey"))
+    Object.values(registry).forEach(neighborhood => neighborhood.setGreyedOut(false))
+    Object.values(registry).forEach(neighborhood => neighborhood.setShowName(false))
+
+    setGameState(_INITIAL_GAME_STATE)
+    randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict, practice, practiceSettings.enabled_boros)
+  }
+
+  useEffect(()=>{resetGame()}, [location.pathname])
 
   // Apply saved game state
   const savedGameStateApplied = useRef(false);
 
   useEffect(() => {
-    if (!context.current) return;
+    if (!registry) return;
     // Wait for all neighborhoods to be registered. 
     if (!neighborhoods.length) return;
     if (!neighborhoods.every(
-      n => context.current[n.id] !== undefined
+      n => registry[n.id] !== undefined
     )) {
       return;
     }
@@ -127,36 +141,42 @@ function AppInner({ debug = false, practice = false }) {
       }
 
     if (gameState.showed_outlines){
-      Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true))
+      Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(true))
     }
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
-      if (context.current[id]) {
-        if(!gameState.finished)context.current[id].setGreyedOut(true);
-        context.current[id].setColor(color_code);
-        context.current[id].setEnabled(true);
-        context.current[id].setShowName(true)
+      if (registry[id]) {
+        if(!gameState.finished)registry[id].setGreyedOut(true);
+        registry[id].setColor(color_code);
+        registry[id].setEnabled(true);
+        registry[id].setShowName(true)
       }
     }
     isRouteDone()
 
-  }, [gameState, context.current]);
+  }, [gameState, registry]);
 
   useEffect(() => {
     if (debug || practice) return;
     localStorage.setItem("gameState", JSON.stringify(gameState))
   }, [gameState]);
+
   useEffect(() => {
-    fetchData(setNeighborhoods, setNeighborhoodsDict);
-  }, []
-  );
+    const fetchNeighborhoods = async () => {
+      var [neighborhoodsData, neighborhoodsDictData] = await fetchData();
+      setNeighborhoods(neighborhoodsData)
+      setNeighborhoodsDict(neighborhoodsDictData)
+    };
+
+    fetchNeighborhoods();
+  }, []);
 
   useEffect(() => {
     if (!neighborhoods) {
       return
     }
-    randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict, practice);
+    randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict, practice, practiceSettings.enabled_boros);
   }, [neighborhoods]
   );
 
@@ -164,18 +184,18 @@ function AppInner({ debug = false, practice = false }) {
   useEffect(() => {
     if (
       neighborhoods.length === 0 ||
-      !context.current[gameState.start_neighborhood_id] ||
-      !context.current[gameState.end_neighborhood_id]
+      !registry[gameState.start_neighborhood_id] ||
+      !registry[gameState.end_neighborhood_id]
     ) {
       return;
     }
 
-    context.current[gameState.start_neighborhood_id].setEnabled(true);
-    context.current[gameState.start_neighborhood_id].setColor('#E58A8A');
-    context.current[gameState.start_neighborhood_id].setShowName(true);
-    context.current[gameState.end_neighborhood_id].setEnabled(true);
-    context.current[gameState.end_neighborhood_id].setColor('#7DA9E8');
-    context.current[gameState.end_neighborhood_id].setShowName(true);
+    registry[gameState.start_neighborhood_id].setEnabled(true);
+    registry[gameState.start_neighborhood_id].setColor('#E58A8A');
+    registry[gameState.start_neighborhood_id].setShowName(true);
+    registry[gameState.end_neighborhood_id].setEnabled(true);
+    registry[gameState.end_neighborhood_id].setColor('#7DA9E8');
+    registry[gameState.end_neighborhood_id].setShowName(true);
 
   }, [neighborhoods, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
@@ -187,14 +207,14 @@ function AppInner({ debug = false, practice = false }) {
     if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
       return
     }
-    context.current[value].setGreyedOut(true)
-    context.current[value].setEnabled(true)
-    context.current[value].setShowName(true)
+    registry[value].setGreyedOut(true)
+    registry[value].setEnabled(true)
+    registry[value].setShowName(true)
 
     var color_code = null;
     if (!is_hint) color_code = determineScore(value);
     else color_code = ColorCodes.Hint;
-    context.current[value].setColor(color_code)
+    registry[value].setColor(color_code)
     setGameState({
       ...gameState,
       neighborhoods_guessed: [...gameState.neighborhoods_guessed, value],
@@ -272,13 +292,13 @@ function AppInner({ debug = false, practice = false }) {
 
 
   function setAllEnabled() {
-    Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
-    Object.values(context.current).forEach(neighborhood => neighborhood.setShowName(true));
+    Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(true));
+    Object.values(registry).forEach(neighborhood => neighborhood.setShowName(true));
   }
   function setAllDisabled() {
-    Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(false));
-    Object.values(context.current).forEach(neighborhood => neighborhood.setShowName(false));
-    Object.values(context.current).forEach(neighborhood => neighborhood.setShowName('lightgrey'));
+    Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(false));
+    Object.values(registry).forEach(neighborhood => neighborhood.setShowName(false));
+    Object.values(registry).forEach(neighborhood => neighborhood.setShowName('lightgrey'));
   }
 
 
@@ -299,7 +319,7 @@ function AppInner({ debug = false, practice = false }) {
         if (!visited.has(neighbors[i]) && guessed.includes(neighbors[i])) {
           visited.add(neighbors[i])
           stack.push(neighbors[i])
-          context.current[neighbors[i]].setGreyedOut(false)
+          registry[neighbors[i]].setGreyedOut(false)
         }
       }
     }
@@ -332,7 +352,7 @@ function AppInner({ debug = false, practice = false }) {
     addNeighborhood(next_neighborhood, true)
   }
   function showAllOutlines() {
-    Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
+    Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(true));
     setGameState({...gameState, showed_outlines: true})
   }
   function giveUp() {
@@ -343,18 +363,19 @@ function AppInner({ debug = false, practice = false }) {
   }
   function red_neighborhoods(neighborhoods) {
     for (var val in neighborhoods) {
-      context.current[neighborhoods[val]].setColor('red')
+      registry[neighborhoods[val]].setColor('red')
     }
   }
   function grey_neighborhoods(neighborhoods) {
     for (const val in neighborhoods) {
-      context.current[neighborhoods[val]].setColor('lightgrey')
+      registry[neighborhoods[val]].setColor('lightgrey')
     }
   }
 
   const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
+  const boroNames: string[] = Array.from(new Set(neighborhoods.map(neighborhood => neighborhood.boroname)))
   if (debug) {
     return (
       <div ref={wrapperRef} style={wrapper}>
@@ -373,7 +394,7 @@ function AppInner({ debug = false, practice = false }) {
   }
   return (
     <div ref={wrapperRef} style={wrapper}>
-      <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => navigate('/practice')} showHome={() => navigate('/')} practice={practice}/>
+      <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => {resetGame(); navigate('/practice')}} showHome={() => {navigate('/')}} practice={practice}/>
       <div style={middle_div}>
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} practice={practice} showPracticeSettings={()=>setShowPracticeSettings(true)}  />
@@ -387,7 +408,7 @@ function AppInner({ debug = false, practice = false }) {
           practice={practice}
         />
         <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
-        <PracticeSettings setEnabledBoros={()=> null}showPracticeSettings={showPracticeSettings} onClose={()=>setShowPracticeSettings(false)}/>
+        <PracticeSettings setEnabledBoros={(boros)=> setPracticeSettings({...practiceSettings, enabled_boros:boros})} showPracticeSettings={showPracticeSettings} onClose={()=>{setShowPracticeSettings(false); resetGame();}} boroNames = {boroNames} practiceSettings = {practiceSettings}/>
       </div>
       <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>
         <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />
@@ -399,7 +420,7 @@ function AppInner({ debug = false, practice = false }) {
 
 const COORDS_CACHE_KEY = 'coords_v1';
 
-async function fetchData(setNeighborhoods, setNeighborhoodsDict) {
+async function fetchData() {
 
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -412,11 +433,9 @@ async function fetchData(setNeighborhoods, setNeighborhoodsDict) {
   const cached = localStorage.getItem(COORDS_CACHE_KEY);
   if (cached) {
     const data = JSON.parse(cached);
-    setNeighborhoods(data);
     const dict = {};
     data.forEach((neighborhood) => (dict[neighborhood.id] = neighborhood));
-    setNeighborhoodsDict(dict);
-    return;
+    return [data, dict];
   }
 
   const response = await fetch(`${import.meta.env.BASE_URL}coords.json`);
@@ -429,23 +448,23 @@ async function fetchData(setNeighborhoods, setNeighborhoodsDict) {
     return;
   }
 
-  setNeighborhoods(result.data);
+
   const neighborhoodsDict = {};
   result.data.forEach((neighborhood) => {
     neighborhoodsDict[neighborhood.id] = neighborhood;
   });
-  setNeighborhoodsDict(neighborhoodsDict);
+
 
   localStorage.setItem(COORDS_CACHE_KEY, JSON.stringify(result.data));
+  return [result.data, neighborhoodsDict]
 }
 
 
 
-function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict, practice) {
+function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict, practice, enabled_boros) {
   if (!neighborhoods.length) {
     return
   }
-
   let date = new Date()
   let day = date.getDate() + 1;
   let month = date.getMonth() + 1;
@@ -453,17 +472,19 @@ function randomizeRoute(prev, setGameState, neighborhoods, neighborhoodsDict, pr
   let currentDate = `${day}-${month}-${year}`;
 
   const rng = practice ? Math.random : seedrandom(currentDate)
-  const end_candidates = []
+  var end_candidates = []
   while (!end_candidates.length) {
-    const start_neighborhood_id = Math.floor(rng() * neighborhoods.length);
+    var filtered_neighborhoods = practice && enabled_boros.length ? neighborhoods.filter(neighborhood => enabled_boros.includes(neighborhood.boroname)): neighborhoods
+    const start_neighborhood_id = filtered_neighborhoods[Math.floor(rng() * filtered_neighborhoods.length)].id;
 
 
     const distances = neighborhoodsDict[start_neighborhood_id].distances
     for (let i = 0; i < distances.length; i++) {
-      if (distances[i] > 3 && distances[i] < 8) {
+      if (distances[i] > 1 && distances[i] < 8) {
         end_candidates.push(i)
       }
     }
+    if (practice && enabled_boros.length) end_candidates= end_candidates.filter(id => enabled_boros.includes(neighborhoodsDict[id].boroname))
     const end_neighborhood_id = end_candidates[Math.floor(rng() * end_candidates.length)]
     setGameState({
       ...prev,
