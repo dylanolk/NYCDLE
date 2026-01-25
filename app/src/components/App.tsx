@@ -356,7 +356,7 @@ function AppInner({ debug = false, practice = false }) {
   if (debug) {
     return (
       <div ref={wrapperRef} style={wrapper}>
-        <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => navigate('/practice')} showHome={() => navigate('/')} />
+        <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => navigate('/practice')} showHome={() => navigate('/')} practice={practice} />
         <div style={middle_div}>
           <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
           <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={neighborhoods.map(neighborhood => neighborhood.id)} onHover={red_neighborhoods} offHover={grey_neighborhoods} />
@@ -371,7 +371,7 @@ function AppInner({ debug = false, practice = false }) {
   }
   return (
     <div ref={wrapperRef} style={wrapper}>
-      <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => navigate('/practice')} showHome={() => navigate('/')} />
+      <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => navigate('/practice')} showHome={() => navigate('/')} practice={practice}/>
       <div style={middle_div}>
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />

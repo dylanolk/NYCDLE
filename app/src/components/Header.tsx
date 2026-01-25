@@ -5,9 +5,10 @@ type HeaderProps = {
     showPracticeMode: () => void;
     showInfoScreen: () => void;
     showHome: () => void;
+    practice: boolean; 
 };
 
-export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderProps) {
+export function Header({ showPracticeMode, showInfoScreen, showHome, practice }: HeaderProps) {
     const containerStyle: React.CSSProperties = {
         display: 'flex',
         alignItems: 'center',
@@ -67,6 +68,15 @@ export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderPro
         padding: '5px'
     }
 
+    const practiceStyle: React.CSSProperties ={
+        fontFamily:
+            '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+        fontWeight: 'bold',
+        color: '#7FB685',
+        margin: 0,
+        cursor: 'pointer'
+    }
+
 
     return (
         <header style={containerStyle}>
@@ -76,7 +86,7 @@ export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderPro
             </div>
 
 
-            <h1 style={logoStyle} onClick={showHome}>burrow</h1>
+            <span onClick={showHome}><h1 style={logoStyle}>burrow</h1> {practice ? <h5 style={practiceStyle}>practice</h5>: null}</span>
 
             <div style={infoContainerStyle} title="Info" onClick={showInfoScreen}>
                 <Info size ={40} style={infoStyle} />
