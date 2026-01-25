@@ -161,14 +161,15 @@ export function InfoScreen({ showInfoScreen, onClose }: InfoScreenProps) {
                                 <p>
                                     Neighborhoods are colored <br /> <span style={{ color: 'green', fontWeight: 700 }}>green</span> if they get you closer,<br />
                                     <span style={{ color: 'orange', fontWeight: 700 }}> orange </span> if you've got the right idea,<br />
-                                    and <span style={{ color: 'red', fontWeight: 700 }}> red </span> if you weren't close.
+                                    and <span style={{ color: 'red', fontWeight: 700 }}> red </span> if you weren't close.<br/>
+                                    Neighborhoods that don't connect to the <span style = {{color: COLORS.deep_red, fontWeight: 700}}>starting neighborhood</span> are greyed out. 
                                 </p>
                             </Description>
 
                             {/* Sections */}
                             <Section title="What counts as a neighborhood?" >
                                 <strong>There are no official neighborhood borders for NYC</strong> <br />
-                                This means you might disagree with the borders as drawn. Please remember they are subjective and unofficial. <br /><br />
+                                This means you might disagree with the borders as drawn. Please remember NYC neighborhood borders are fuzzy. <br /><br />
                                 The data burrow uses is from <a href='https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd/about_data' target="_blank">Neighborhood Tabulation Areas</a> used for census reporting. <br /><br />
                                 <i>Though NTA boundaries and their associated names roughly correspond with many neighborhoods commonly recognized by New Yorkers, NTAs are not intended to definitively represent neighborhoods, nor are they intended to be exhaustive of all possible names and understandings of neighborhoods throughout New York City.</i> <br /> <br />
                                 That said, some subjectivity is used. Neighborhoods that are connected by bridge or tunnel in real life should be considered bordering. If you find this is not the case you can contact me at burrow@dylanolk.com
@@ -176,7 +177,7 @@ export function InfoScreen({ showInfoScreen, onClose }: InfoScreenProps) {
 
                             <Section title="Acknowledgements and credits">
                                 burrow is created by Dylan Olk. <br /> <br />
-                                The game takes much inspiration by the wonderful <a href="https://travle.earth" target="_blank">travle.earth</a> by the talented Oisín Carroll and team. <br /><br />
+                                The game takes much inspiration from the wonderful <a href="https://travle.earth" target="_blank">travle.earth</a> by the talented Oisín Carroll and team. <br /><br />
                                 Data is sourced from <a href='https://data.cityofnewyork.us/City-Government/2020-Neighborhood-Tabulation-Areas-NTAs-/9nt8-h7nd/about_data' target="_blank">Neighborhood Tabulation Areas</a> from the city of New York. <br /> <br />
                                 burrow is built with React.js using Vite, Headless UI, and d3.
 

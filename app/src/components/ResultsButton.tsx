@@ -2,7 +2,7 @@ import { COLORS } from "../constants";
 
 
 export function ResultsButton({showResults}){
-    return(<div style ={{padding: '5px 0px'}}>
+    return(<div style ={{padding: '5px 0px', marginBottom: '3rem'}}>
                 <button
                     onClick={showResults}
                     style={{
