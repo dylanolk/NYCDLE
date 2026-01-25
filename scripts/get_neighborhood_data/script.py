@@ -94,31 +94,33 @@ def merge_like_neighborhoods(neighborhoods: list[Neighborhood]):
     neighborhoods_dict: dict[str:Neighborhood] = {}
     for neighborhood in neighborhoods:
         original_name = neighborhood.name
-        if original_name != "Co-op City":  # exception to dash rule
-            name_tuple = ()
-            for name in original_name.split("-"):
-                name = name.removesuffix("(North)")
-                name = name.removesuffix("(South)")
-                name = name.removesuffix("(East)")
-                name = name.removesuffix("(West)")
-                name = name.removesuffix("(Central)")
-                name = name.strip()
-                name_tuple = name_tuple + (name,)
+        if original_name == "Co-op City": # exception to dash rule
+            neighborhoods_dict[(original_name,)] = neighborhood
+            continue
+        name_tuple = ()
+        for name in original_name.split("-"):
+            name = name.removesuffix("(North)")
+            name = name.removesuffix("(South)")
+            name = name.removesuffix("(East)")
+            name = name.removesuffix("(West)")
+            name = name.removesuffix("(Central)")
+            name = name.strip()
+            name_tuple = name_tuple + (name,)
 
-            key = find_dict_entry(
-                dict=neighborhoods_dict, tuple=name_tuple, neighborhood=neighborhood
-            )
-            if key:
-                neighborhoods_dict[key].polygons += neighborhood.polygons
-                neighborhoods_dict[
-                    key
-                ].geometry.coordinates += neighborhood.geometry.coordinates
-                new_key = key + tuple(name for name in name_tuple if name not in key)
-                if key != new_key:
-                    neighborhoods_dict[new_key] = neighborhoods_dict[key]
-                    del neighborhoods_dict[key]
-            else:
-                neighborhoods_dict[name_tuple] = neighborhood
+        key = find_dict_entry(
+            dict=neighborhoods_dict, tuple=name_tuple, neighborhood=neighborhood
+        )
+        if key:
+            neighborhoods_dict[key].polygons += neighborhood.polygons
+            neighborhoods_dict[
+                key
+            ].geometry.coordinates += neighborhood.geometry.coordinates
+            new_key = key + tuple(name for name in name_tuple if name not in key)
+            if key != new_key:
+                neighborhoods_dict[new_key] = neighborhoods_dict[key]
+                del neighborhoods_dict[key]
+        else:
+            neighborhoods_dict[name_tuple] = neighborhood
     return_dict: dict[str, Neighborhood] = {}
     for k in neighborhoods_dict.keys():
         neighborhoods_dict[k].name = "-".join(k)

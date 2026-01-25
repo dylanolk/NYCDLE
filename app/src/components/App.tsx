@@ -114,15 +114,18 @@ function AppInner({ debug = false, practice = false }) {
       setAllDisabled();
       return;
     }
-    if (gameState.finished) setAllEnabled();
-    if (gameState.finished) setEndScreenVisible(true);
+    if (gameState.finished) 
+      { 
+        setAllEnabled();
+        setEndScreenVisible(true);
+      }
 
 
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
       if (context.current[id]) {
-        context.current[id].setGreyedOut(true);
+        if(!gameState.finished)context.current[id].setGreyedOut(true);
         context.current[id].setColor(color_code);
         context.current[id].setEnabled(true);
         context.current[id].setShowName(true)
