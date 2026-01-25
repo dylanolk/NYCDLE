@@ -102,20 +102,22 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                 }}
             >
 
-                <DialogPanel
-                    style={{
-                        width: window.innerWidth <= 820 ? "90%" : "30%",
-                        maxHeight: '80vh',
-                        padding: T.space.lg,
-                        borderRadius: T.radius.lg,
-                        background: COLORS.dark_blue,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        boxShadow: '0 30px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
-                        alignItems: 'center',
+<DialogPanel
+    style={{
+        width: window.innerWidth <= 820 ? "90%" : "30%",
+        maxHeight: '80vh',
+        padding: T.space.lg,
+        borderRadius: T.radius.lg,
+        background: COLORS.dark_blue,
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '0 30px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
+        alignItems: 'center',
+        overflowY: 'auto',
+        scrollbarWidth: 'thin',
+    }}
+>
 
-                    }}
-                >
                     <DialogTitle style={{ color: COLORS.lifted_background, fontSize: '28px', fontWeight: 800 }}>
                         {gameState.gave_up ? "Better luck next time" : "🎉 You Did It!"}
                     </DialogTitle>
