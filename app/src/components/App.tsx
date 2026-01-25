@@ -122,11 +122,13 @@ function AppInner({ debug = false, practice = false }) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
       if (context.current[id]) {
+        context.current[id].setGreyedOut(true);
         context.current[id].setColor(color_code);
         context.current[id].setEnabled(true);
         context.current[id].setShowName(true)
       }
     }
+    isRouteDone()
 
   }, [gameState, context.current]);
 
@@ -173,6 +175,7 @@ function AppInner({ debug = false, practice = false }) {
     if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
       return
     }
+    context.current[value].setGreyedOut(true)
     context.current[value].setEnabled(true)
     context.current[value].setShowName(true)
 
@@ -284,6 +287,7 @@ function AppInner({ debug = false, practice = false }) {
         if (!visited.has(neighbors[i]) && guessed.includes(neighbors[i])) {
           visited.add(neighbors[i])
           stack.push(neighbors[i])
+          context.current[neighbors[i]].setGreyedOut(false)
         }
       }
     }

@@ -17,7 +17,7 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
     const [enabled, setEnabled] = useState(false);
     const [color, setColor] = useState("lightgrey");
     const [showName, setShowName] = useState(false);
-
+    const [greyedOut, setGreyedOut] =useState(false)
     const [hovered, setHovered] = useState(false);
     const [offset, setOffset] = useState(0);
 
@@ -30,9 +30,15 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
     const [labelSize, setLabelSize] = useState({ width: 0, height: 0 });
 
     useEffect(() => {
-        context.current[neighborhood.id] = { setEnabled, setColor, setShowName };
+        context.current[neighborhood.id] = {
+            setEnabled,
+            setColor,
+            setShowName,
+            setGreyedOut,   
+        };
         return () => delete context.current[neighborhood.id];
     }, []);
+    
 
     useEffect(() => {
         if (neighborhood.polygons.length === 0) return;
@@ -80,15 +86,19 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
                 setHovered(true);
                 const el = gRef.current;
                 if (el && el.parentNode && el.parentNode.lastChild !== el) {
-                    el.parentNode.appendChild(el); // bring to front
+                    el.parentNode.appendChild(el);
                 }
-                onHover(neighborhood.borders)
+                onHover(neighborhood.borders);
             }}
             onMouseLeave={() => {
-                setHovered(false)
-                offHover(neighborhood.borders)
+                setHovered(false);
+                offHover(neighborhood.borders);
             }}
-            style={{ cursor: enabled ? "pointer" : "auto" }}
+            style={{
+                cursor: enabled ? "pointer" : "auto",
+                opacity: greyedOut ? 0.4 : 1, 
+                transition: "opacity 150ms ease",
+            }}
             transform={`translate(0, ${offset})`}
         >
             {neighborhood.polygons.map((polygon: any[], j: number) => (
