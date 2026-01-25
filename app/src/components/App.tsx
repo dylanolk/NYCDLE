@@ -15,6 +15,7 @@ import { InfoScreen } from './InfoScreen';
 import { Header } from './Header.tsx';
 import { COLORS } from '../constants.tsx'
 import { preconnect } from 'react-dom';
+import { ResultsButton } from './ResultsButton.tsx';
 
 export enum ColorCodes {
   Good = COLORS.logo_color,
@@ -359,7 +360,7 @@ function AppInner({ debug = false, practice = false }) {
         <div style={middle_div}>
           <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
           <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={neighborhoods.map(neighborhood => neighborhood.id)} onHover={red_neighborhoods} offHover={grey_neighborhoods} />
-          <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
+          {!gameState.finished? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} /> : <ResultsButton showResults = {()=> setEndScreenVisible(true)}/>}
           <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
         </div>
         <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>
@@ -374,7 +375,7 @@ function AppInner({ debug = false, practice = false }) {
       <div style={middle_div}>
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
-        <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} />
+        {!gameState.finished? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} /> : <ResultsButton showResults = {()=> setEndScreenVisible(true)}/>}
         <EndScreen
           endScreenVisible={endScreenVisible}
           onClose={() => setEndScreenVisible(false)}
