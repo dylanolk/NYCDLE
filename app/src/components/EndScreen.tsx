@@ -57,7 +57,7 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
     var hint_counter = 0
     if (!gameState.gave_up) {
         emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
-        text_to_copy = "I just beat" + (!practice ? " today's daily burrow!" : ` a practice burrow from ${neighborhoodsDict[gameState.start_neighborhood_id]?.name} to ${neighborhoodsDict[gameState.end_neighborhood_id]?.name}`)
+        text_to_copy = "I just beat" + (!practice ? " today's daily burrow!" : ` a practice burrow from ${neighborhoodsDict[gameState.start_neighborhood_id]?.name} to ${neighborhoodsDict[gameState.end_neighborhood_id]?.name}`)+'\n'+emoji_string
         hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length + gameState.showed_outlines
         if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hint` + (hint_counter>1 ?  "s!": "!")
         text_to_copy += "\nburrow.dylanolk.com"
