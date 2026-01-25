@@ -30,6 +30,7 @@ export function MapDisplay({
             aspectRatio: '4/3',
             boxSizing: 'border-box',
             width: '100%',
+            overflow: 'hidden',
         },
     };
 
