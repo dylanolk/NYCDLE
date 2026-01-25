@@ -16,6 +16,7 @@ import { Header } from './Header.tsx';
 import { COLORS } from '../constants.tsx'
 import { preconnect } from 'react-dom';
 import { ResultsButton } from './ResultsButton.tsx';
+import {PracticeSettings} from './PracticeSettings.tsx';
 
 export enum ColorCodes {
   Good = COLORS.logo_color,
@@ -56,6 +57,8 @@ function AppInner({ debug = false, practice = false }) {
       return true
     }
   })
+  const [showPracticeSettings, setShowPracticeSettings] = useState(false)
+  const [endScreenVisible, setEndScreenVisible] = useState(false);
   const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
   const [neighborhoodsDict, setNeighborhoodsDict] = useState({});
   const [gameState, setGameState] = useState(() => {
@@ -92,10 +95,9 @@ function AppInner({ debug = false, practice = false }) {
       }
     }
   })
-  const [endScreenVisible, setEndScreenVisible] = useState(false);
   const context = useContext(NeighborhoodsContext)
 
-  // Load apply saved game state
+  // Apply saved game state
   const savedGameStateApplied = useRef(false);
 
   useEffect(() => {
@@ -374,7 +376,7 @@ function AppInner({ debug = false, practice = false }) {
       <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => navigate('/practice')} showHome={() => navigate('/')} practice={practice}/>
       <div style={middle_div}>
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
-        <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} />
+        <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} practice={practice} showPracticeSettings={()=>setShowPracticeSettings(true)}  />
         {!gameState.finished? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} /> : <ResultsButton showResults = {()=> setEndScreenVisible(true)}/>}
         <EndScreen
           endScreenVisible={endScreenVisible}
@@ -385,6 +387,7 @@ function AppInner({ debug = false, practice = false }) {
           practice={practice}
         />
         <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
+        <PracticeSettings setEnabledBoros={()=> null}showPracticeSettings={showPracticeSettings} onClose={()=>setShowPracticeSettings(false)}/>
       </div>
       <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>
         <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />

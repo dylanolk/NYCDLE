@@ -2,12 +2,15 @@ import { useEffect, useRef } from "react";
 import { Neighborhood } from "./Neighborhood";
 import * as d3 from 'd3';
 import { COLORS } from "../constants";
+import { Settings } from "lucide-react";
 
 type NeighborhoodProps = {
     neighborhoods: any[],
     enabled_neighborhoods_ids: number[],
     onHover: (id: number[]) => void;
     offHover: (id: number[]) => void;
+    showPracticeSettings: () => void; 
+    practice: boolean;
 };
 
 export function MapDisplay({
@@ -15,6 +18,8 @@ export function MapDisplay({
     enabled_neighborhoods_ids,
     onHover = () => null,
     offHover = () => null,
+    showPracticeSettings = () => null,
+    practice = false,
 }: NeighborhoodProps) {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const gRef = useRef<SVGGElement | null>(null);
@@ -31,6 +36,7 @@ export function MapDisplay({
             boxSizing: 'border-box',
             width: '100%',
             overflow: 'hidden',
+            position: 'relative',
         },
     };
 
@@ -93,7 +99,35 @@ export function MapDisplay({
     }
 
     return (
+        
         <div style={styles.box}>
+            {practice && (
+    <div
+        onClick={showPracticeSettings}
+        style={{
+            position: 'absolute',
+            top: '10px',
+            left: '10px',
+            width: '34px',
+            height: '34px',
+            borderRadius: '10px',
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#fff',
+            fontSize: '18px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
+        }}
+        title="Practice settings"
+    >
+        <Settings size={18} strokeWidth={2} />
+
+    </div>
+)}
+
             <svg
                 ref={svgRef}
                 style={{ width: '100%', height: '100%', background: COLORS.lifted_background }}
