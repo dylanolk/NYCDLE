@@ -126,27 +126,7 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                         {(gameState.gave_up ? "You gave up on" : "You completed") + (!practice ? " today's burrow!" : " a practice burrow!")}
                     </Description>
 
-                    <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
-                        Your route: <span style={{ color: COLORS.deep_red }}>
-                            {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
-                        </span>
-
-                        {Object.keys(neighborhoodsDict).length ? (
-                            gameState.neighborhoods_guessed.map((id, index) => (
-                                <span>
-                                    <span key={index} style={{ color: gameState.color_tracker[index] == ColorCodes.Hint ? COLORS.background_color : gameState.color_tracker[index] }}>
-                                        {neighborhoodsDict[id].name + ' → '}
-                                    </span>
-                                </span>
-                            ))
-                        ) : null}
-                        {gameState.gave_up ? <span>(Then you gave up)</span> :
-                            <span style={{ color: COLORS.blue }}>
-                                {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.end_neighborhood_id]?.name : null}
-                            </span>
-                        }
-                    </Description>
-
+                   
                     {
                         practice? null:
                         <Description style = {{color: COLORS.lifted_background}}>
@@ -203,6 +183,27 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                     >
                         Close
                     </button>
+                     <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
+                        Your route: <span style={{ color: COLORS.deep_red }}>
+                            {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
+                        </span>
+
+                        {Object.keys(neighborhoodsDict).length ? (
+                            gameState.neighborhoods_guessed.map((id, index) => (
+                                <span>
+                                    <span key={index} style={{ color: gameState.color_tracker[index] == ColorCodes.Hint ? COLORS.background_color : gameState.color_tracker[index] }}>
+                                        {neighborhoodsDict[id].name + ' → '}
+                                    </span>
+                                </span>
+                            ))
+                        ) : null}
+                        {gameState.gave_up ? <span>(Then you gave up)</span> :
+                            <span style={{ color: COLORS.blue }}>
+                                {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.end_neighborhood_id]?.name : null}
+                            </span>
+                        }
+                    </Description>
+
                     {gameState.neighborhoods_guessed.length != optimalRoute.length - 1 ?
                         (<Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
                             You could've done: <span style={{ color: COLORS.deep_red }}>
