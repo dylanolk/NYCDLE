@@ -147,6 +147,13 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                         }
                     </Description>
 
+                    {
+                        practice? null:
+                        <Description style = {{color: COLORS.lifted_background}}>
+                            Come back tomorrow for a new challenge!
+                        </Description>
+                    }
+
 
                     <div
                         style={{
@@ -168,8 +175,8 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                             padding: '12px',
                             borderRadius: '12px',
                             border: 'none',
-                            background: '#111',
-                            color: 'white',
+                            background: COLORS.deep_red,
+                            color: COLORS.lifted_background,
                             fontWeight: 600,
                             display: 'flex',
                             alignItems: 'center',
