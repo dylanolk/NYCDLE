@@ -37,8 +37,6 @@ export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderPro
     const iconStyle: React.CSSProperties = {
         cursor: 'pointer',
         color: '#0E79B2',
-        width: '24px',
-        height: '24px',
         transition: 'transform 0.2s ease',
         padding: '5px'
     };
@@ -65,8 +63,6 @@ export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderPro
     const infoStyle: React.CSSProperties = {
         cursor: 'pointer',
         color: '#0E79B2',
-        width: '100px',
-        height: '100px',
         transition: 'transform 0.2s ease',
         padding: '5px'
     }
@@ -83,7 +79,7 @@ export function Header({ showPracticeMode, showInfoScreen, showHome }: HeaderPro
             <h1 style={logoStyle} onClick={showHome}>burrow</h1>
 
             <div style={infoContainerStyle} title="Info" onClick={showInfoScreen}>
-                <Info style={infoStyle} />
+                <Info size ={40} style={infoStyle} />
             </div>
         </header >
     );

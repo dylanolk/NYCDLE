@@ -294,19 +294,18 @@ function AppInner({ debug = false, practice = false }) {
 
 
   const wrapper: CSSProperties = {
-    height: '130svh',
+    minHeight: "130svh",
+    maxHeight: "200svh",
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: COLORS.background_color,
     flexDirection: 'column',
     padding: 0,
-    overflowY: 'auto'
   }
   const middle_div: CSSProperties = {
     width: window.innerWidth <= 820 ? "90%" : "40%",
     flex: 2,
-    maxWidth: "1200px",
     display: "flex",
     flexDirection: "column",
     justifyContent: 'center',
