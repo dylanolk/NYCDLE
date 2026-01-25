@@ -58,14 +58,14 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
     if (!gameState.gave_up) {
         emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
         text_to_copy = "I just beat" + (!practice ? " today's daily burrow!" : ` a practice burrow from ${neighborhoodsDict[gameState.start_neighborhood_id]?.name} to ${neighborhoodsDict[gameState.end_neighborhood_id]?.name}`)
-        hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length
+        hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length + gameState.showed_outlines
         if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hint` + (hint_counter>1 ?  "s!": "!")
         text_to_copy += "\nburrow.dylanolk.com"
     }
     else {
         emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
         text_to_copy = `I just finished today's daily burrow!\n${emoji_string}`
-        hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length
+        hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length + gameState.showed_outlines
         if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hint` + (hint_counter>1 ?  "s!": "!")
         if (gameState.color_tracker.length) text_to_copy += "\n...and then I gave up!"
         else text_to_copy += "\n...I didn't even try!"

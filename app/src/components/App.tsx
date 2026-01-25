@@ -14,6 +14,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { InfoScreen } from './InfoScreen';
 import { Header } from './Header.tsx';
 import { COLORS } from '../constants.tsx'
+import { preconnect } from 'react-dom';
 
 export enum ColorCodes {
   Good = COLORS.logo_color,
@@ -76,6 +77,7 @@ function AppInner({ debug = false, practice = false }) {
         end_neighborhood_id: null,
         finished: false,
         gave_up: false,
+        showed_outlines: false,
       }
     } catch {
       return {
@@ -85,6 +87,7 @@ function AppInner({ debug = false, practice = false }) {
         end_neighborhood_id: null,
         finished: false,
         gave_up: false,
+        showed_outlines: false, 
       }
     }
   })
@@ -120,7 +123,9 @@ function AppInner({ debug = false, practice = false }) {
         setEndScreenVisible(true);
       }
 
-
+    if (gameState.showed_outlines){
+      Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true))
+    }
     for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
       const id = gameState.neighborhoods_guessed[i];
       const color_code = gameState.color_tracker[i];
@@ -325,6 +330,7 @@ function AppInner({ debug = false, practice = false }) {
   }
   function showAllOutlines() {
     Object.values(context.current).forEach(neighborhood => neighborhood.setEnabled(true));
+    setGameState({...gameState, showed_outlines: true})
   }
   function giveUp() {
     if (gameState.finished) return;
