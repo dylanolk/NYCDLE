@@ -53,14 +53,14 @@ export function App() {
 }
 
 const _INITIAL_GAME_STATE ={
-        neighborhoods_guessed: [],
-        color_tracker: [],
-        start_neighborhood_id: null,
-        end_neighborhood_id: null,
-        finished: false,
-        gave_up: false,
-        showed_outlines: false, 
-      }
+  neighborhoods_guessed: [],
+  color_tracker: [],
+  start_neighborhood_id: null,
+  end_neighborhood_id: null,
+  finished: false,
+  gave_up: false,
+  showed_outlines: false, 
+}
 
 function AppInner({ debug = false, practice = false }) {
   const navigate = useNavigate();
@@ -105,8 +105,11 @@ function AppInner({ debug = false, practice = false }) {
     Object.values(registry).forEach(neighborhood => neighborhood.setGreyedOut(false))
     Object.values(registry).forEach(neighborhood => neighborhood.setShowName(false))
 
-    setGameState(_INITIAL_GAME_STATE)
-    randomizeRoute(gameState, setGameState, neighborhoods, neighborhoodsDict, practice, practiceSettings.enabled_boros)
+    const state = practice ? _INITIAL_GAME_STATE: gameState
+    if(practice){
+      setGameState(_INITIAL_GAME_STATE);
+    }
+    randomizeRoute(state, setGameState, neighborhoods, neighborhoodsDict, practice, practiceSettings.enabled_boros)
   }
 
   useEffect(()=>{resetGame()}, [location.pathname])
@@ -200,7 +203,7 @@ function AppInner({ debug = false, practice = false }) {
   }, [neighborhoods, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
   useEffect(()=>{
-              resetGame();
+    resetGame();
   },[practiceSettings.enabled_boros])
   const wrapperRef = useRef(null)
 
