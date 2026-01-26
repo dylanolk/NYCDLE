@@ -199,6 +199,9 @@ function AppInner({ debug = false, practice = false }) {
 
   }, [neighborhoods, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);
 
+  useEffect(()=>{
+              resetGame();
+  },[practiceSettings.enabled_boros])
   const wrapperRef = useRef(null)
 
   function addNeighborhood(value, is_hint = false) {
@@ -408,7 +411,15 @@ function AppInner({ debug = false, practice = false }) {
           practice={practice}
         />
         <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
-        <PracticeSettings setEnabledBoros={(boros)=> setPracticeSettings({...practiceSettings, enabled_boros:boros})} showPracticeSettings={showPracticeSettings} onClose={()=>{setShowPracticeSettings(false); resetGame();}} boroNames = {boroNames} practiceSettings = {practiceSettings}/>
+        <PracticeSettings 
+          setEnabledBoros={(boros)=> setPracticeSettings({...practiceSettings, enabled_boros:boros})} 
+          showPracticeSettings={showPracticeSettings} 
+          onClose={()=>{
+            setShowPracticeSettings(false); 
+          }} 
+          boroNames = {boroNames}
+          practiceSettings = {practiceSettings}
+        />
       </div>
       <div style={{ width: window.innerWidth <= 820 ? "90%" : "40%", flex: .9 }}>
         <HintBox showNextNeighborhood={showNextNeighborhood} showAllOutlines={showAllOutlines} giveUp={giveUp} />

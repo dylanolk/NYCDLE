@@ -124,6 +124,7 @@ export function SearchBar({ neighborhoods, addNeighborhood, wrapperRef }: Search
         marginBottom: '3rem',
         fontFamily:
             '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+        onclick: ()=>null
 
     }
 

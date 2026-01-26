@@ -18,7 +18,7 @@ export function PracticeSettings({ setEnabledBoros, onClose, showPracticeSetting
     }
 
     return (
-        <Dialog open={showPracticeSettings} onClose={onClose}>
+        <Dialog open={showPracticeSettings} onClose={()=>null}>
             {/* Backdrop */}
             <div
                 style={{
