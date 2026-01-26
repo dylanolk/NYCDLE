@@ -48,12 +48,12 @@ export function GoalBox({
     }
 
     const startStyle: React.CSSProperties = {
-        color: '#BF1363',
+        color: COLORS.pale_red,
         fontWeight: 700,
     };
 
     const endStyle: React.CSSProperties = {
-        color: '#0E79B2',
+        color: COLORS.blue,
         fontWeight: 700,
     };
 

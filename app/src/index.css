@@ -9,9 +9,5 @@ body {
 
 
 html {
-    overflow-y: hidden;
-}
-
-body {
     overflow-y: auto;
 }

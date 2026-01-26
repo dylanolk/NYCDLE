@@ -194,10 +194,10 @@ function AppInner({ debug = false, practice = false }) {
     }
 
     registry[gameState.start_neighborhood_id].setEnabled(true);
-    registry[gameState.start_neighborhood_id].setColor('#E58A8A');
+    registry[gameState.start_neighborhood_id].setColor(COLORS.pale_red);
     registry[gameState.start_neighborhood_id].setShowName(true);
     registry[gameState.end_neighborhood_id].setEnabled(true);
-    registry[gameState.end_neighborhood_id].setColor('#7DA9E8');
+    registry[gameState.end_neighborhood_id].setColor(COLORS.blue);
     registry[gameState.end_neighborhood_id].setShowName(true);
 
   }, [neighborhoods, gameState.start_neighborhood_id, gameState.end_neighborhood_id]);

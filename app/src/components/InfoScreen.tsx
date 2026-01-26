@@ -154,15 +154,15 @@ export function InfoScreen({ showInfoScreen, onClose }: InfoScreenProps) {
                                 }}
                             >
                                 <p style={{ marginBottom: T.space.xs }}>
-                                    Connect the <span style={{ color: '#E58A8A', fontWeight: 700 }}>starting neighborhood </span>
-                                    to the <span style={{ color: '#7DA9E8', fontWeight: 700 }}> ending neighborhood </span>
+                                    Connect the <span style={{ color: COLORS.pale_red, fontWeight: 700 }}>starting neighborhood </span>
+                                    to the <span style={{ color: COLORS.blue, fontWeight: 700 }}> ending neighborhood </span>
                                     in as few moves as possible.
                                 </p>
                                 <p>
-                                    Neighborhoods are colored <br /> <span style={{ color: 'green', fontWeight: 700 }}>green</span> if they get you closer,<br />
+                                    Neighborhoods are colored <br /> <span style={{ color: COLORS.logo_color, fontWeight: 700 }}>green</span> if they get you closer,<br />
                                     <span style={{ color: 'orange', fontWeight: 700 }}> orange </span> if you've got the right idea,<br />
-                                    and <span style={{ color: 'red', fontWeight: 700 }}> red </span> if you weren't close.<br/>
-                                    Neighborhoods that don't connect to the <span style = {{color: COLORS.deep_red, fontWeight: 700}}>starting neighborhood</span> are greyed out. 
+                                    and <span style={{ color: COLORS.deep_red, fontWeight: 700 }}> red </span> if you weren't close.<br/>
+                                    Neighborhoods that don't connect to the <span style = {{color: COLORS.pale_red, fontWeight: 700}}>starting neighborhood</span> are greyed out. 
                                 </p>
                             </Description>
 
