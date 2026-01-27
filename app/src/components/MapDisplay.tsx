@@ -1,15 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Neighborhood } from "./Neighborhood";
 import * as d3 from 'd3';
 import { COLORS } from "../constants";
-import { Settings } from "lucide-react";
+import { Settings, RotateCcw } from "lucide-react";
+import { reset } from "svg-pan-zoom";
 
 type NeighborhoodProps = {
     neighborhoods: any[],
     enabled_neighborhoods_ids: number[],
     onHover: (id: number[]) => void;
     offHover: (id: number[]) => void;
-    showPracticeSettings: () => void; 
+    showPracticeSettings: () => void;
     practice: boolean;
 };
 
@@ -23,9 +24,10 @@ export function MapDisplay({
 }: NeighborhoodProps) {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const gRef = useRef<SVGGElement | null>(null);
-
-    // Tracks first render to avoid transition
+    const [resetCounter, setResetCounter] = useState(0)
+    const [screenMoved, setScreenMoved] = useState(false)
     const firstRender = useRef(true);
+    const programaticZoom = useRef(false);
 
     const styles = {
         box: {
@@ -55,7 +57,9 @@ export function MapDisplay({
             })
             .on('zoom', (event) => {
                 g.attr('transform', event.transform);
-            });
+                if (!event.sourceEvent) return;
+                setScreenMoved(true);
+            })
 
         svg.call(zoom_behavior);
         if (enabled_neighborhoods_ids.length && neighborhoods.length) {
@@ -85,48 +89,78 @@ export function MapDisplay({
             const transform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
 
             if (firstRender.current) {
-                svg.call(zoom_behavior.transform, transform);
+
+                svg.call(zoom_behavior.transform, transform).on('end');
                 firstRender.current = false;
             } else {
-                svg.transition().duration(750).call(zoom_behavior.transform, transform);
+
+                svg.transition().duration(750).call(zoom_behavior.transform, transform).on('end');
             }
         }
 
-    }, [neighborhoods, enabled_neighborhoods_ids]);
+    }, [neighborhoods, enabled_neighborhoods_ids, resetCounter]);
 
     if (!neighborhoods || neighborhoods.length === 0) {
         return <div style={styles.box}>Loading...</div>;
     }
 
     return (
-        
+
         <div style={styles.box}>
             {practice && (
-    <div
-        onClick={showPracticeSettings}
-        style={{
-            position: 'absolute',
-            top: '10px',
-            left: '10px',
-            width: '34px',
-            height: '34px',
-            borderRadius: '10px',
-            background: 'rgba(0,0,0,0.45)',
-            backdropFilter: 'blur(6px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#fff',
-            fontSize: '18px',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
-        }}
-        title="Practice settings"
-    >
-        <Settings size={18} strokeWidth={2} />
+                <div
+                    onClick={showPracticeSettings}
+                    style={{
+                        position: 'absolute',
+                        top: '10px',
+                        left: '10px',
+                        width: '34px',
+                        height: '34px',
+                        borderRadius: '10px',
+                        background: 'rgba(0,0,0,0.45)',
+                        backdropFilter: 'blur(6px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        color: '#fff',
+                        fontSize: '18px',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
+                    }}
+                    title="Practice settings"
+                >
+                    <Settings size={18} strokeWidth={2} />
 
-    </div>
-)}
+                </div>
+            )}
+            {screenMoved && <div
+                onClick={() => {
+                    setResetCounter(resetCounter + 1)
+                    setScreenMoved(false);
+                }}
+                style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '10px',
+                    background: 'rgba(0,0,0,0.45)',
+                    backdropFilter: 'blur(6px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#fff',
+                    fontSize: '18px',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.35)',
+                }}
+                title="Practice settings"
+            >
+
+                <RotateCcw size={18} strokeWidth={2} />
+
+            </div>}
 
             <svg
                 ref={svgRef}
