@@ -18,24 +18,54 @@ export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
-const isCoarsePointer =
-  typeof window !== 'undefined' &&
-  window.matchMedia('(pointer: coarse)').matches
 
-useEffect(() => {
-  if (isCoarsePointer) return
+  useEffect(() => {
+    let startX = 0
+    let startY = 0
+    let moved = false
 
-  const handler = (e: MouseEvent) => {
-    if (!wrapperRef.current) return
-    if (!wrapperRef.current.contains(e.target as Node)) {
-      setOpen(false)
-      setActiveIndex(0)
+    const onPointerDown = (e: PointerEvent) => {
+      // Only care about primary button / finger
+      if (e.button !== 0) return
+
+      startX = e.clientX
+      startY = e.clientY
+      moved = false
     }
-  }
 
-  document.addEventListener('mousedown', handler)
-  return () => document.removeEventListener('mousedown', handler)
-}, [isCoarsePointer])
+    const onPointerMove = (e: PointerEvent) => {
+      const dx = Math.abs(e.clientX - startX)
+      const dy = Math.abs(e.clientY - startY)
+
+      // If finger moves more than a few pixels → it's a scroll
+      if (dx > 8 || dy > 8) {
+        moved = true
+      }
+    }
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (moved) return // was a scroll, ignore
+
+      if (!wrapperRef.current) return
+
+      // A real tap outside → close
+      if (!wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false)
+        setActiveIndex(0)
+      }
+    }
+
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('pointermove', onPointerMove)
+    document.addEventListener('pointerup', onPointerUp)
+
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('pointermove', onPointerMove)
+      document.removeEventListener('pointerup', onPointerUp)
+    }
+  }, [])
+
 
 
   const baseOptions = useMemo(
@@ -84,7 +114,7 @@ useEffect(() => {
 
   return (
     <div
-    ref={wrapperRef}
+      ref={wrapperRef}
       style={{
         width: '100%',
         padding: '8px 0',
@@ -112,7 +142,7 @@ useEffect(() => {
           value={inputValue}
           placeholder="Search neighborhoods…"
           onFocus={() => {
-            setInputValue('')      // clear on click
+            setInputValue('')
             setOpen(true)
           }}
           onChange={(e) => {
@@ -130,7 +160,7 @@ useEffect(() => {
               )
             }
 
-            if (e.key === 'AxrrowUp') {
+            if (e.key === 'ArrowUp') {
               e.preventDefault()
               setActiveIndex((i) => Math.max(i - 1, 0))
             }
@@ -170,7 +200,6 @@ useEffect(() => {
             boxShadow: '0 18px 36px rgba(0,0,0,0.14)',
             maxHeight: 320,
             overflowY: 'auto',
-            zIndex: 10,
             padding: '6px 0',
           }}
         >
@@ -180,7 +209,7 @@ useEffect(() => {
               <div
                 key={o.value}
                 onMouseEnter={() => setActiveIndex(i)}
-                onMouseDown={(e) => e.preventDefault()} // prevent input blur
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => commit(o)}
                 style={{
                   padding: '12px 18px',
