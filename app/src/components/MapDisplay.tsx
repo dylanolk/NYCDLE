@@ -12,6 +12,7 @@ type NeighborhoodProps = {
     offHover: (id: number[]) => void;
     showPracticeSettings: () => void;
     practice: boolean;
+    onClick: (name: string) => void;
 };
 
 export function MapDisplay({
@@ -21,6 +22,7 @@ export function MapDisplay({
     offHover = () => null,
     showPracticeSettings = () => null,
     practice = false,
+    onClick = () => null,
 }: NeighborhoodProps) {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const gRef = useRef<SVGGElement | null>(null);
@@ -92,9 +94,11 @@ export function MapDisplay({
 
                 svg.call(zoom_behavior.transform, transform).on('end');
                 firstRender.current = false;
+                setScreenMoved(false);
             } else {
 
                 svg.transition().duration(750).call(zoom_behavior.transform, transform).on('end');
+                setScreenMoved(false);
             }
         }
 
@@ -173,6 +177,7 @@ export function MapDisplay({
                             neighborhood={neighborhood}
                             onHover={onHover}
                             offHover={offHover}
+                            onClick={onClick}
                         />
                     ))}
                 </g>

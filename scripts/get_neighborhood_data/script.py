@@ -9,7 +9,8 @@ data = get("https://data.cityofnewyork.us/resource/9nt8-h7nd.json")
 
 neighborhoods: list[Neighborhood] = NeighborhoodSchema().load(data.json(), many=True)
 _NEIGHBORHOODS_TO_MERGE = {
-    "Astoria-Ditmars-Steinway-Woodside":["Old Astoria-Hallets Point"] # Old astoria is not really a separate neighborhood
+    "Astoria-Ditmars-Steinway-Woodside":["Old Astoria-Hallets Point"], # Old astoria is not really a separate neighborhood
+    "Washington Heights": ["Highbridge Park"] # Messes with borders, and it's a park
 }
 
 def mercator(lon, lat):

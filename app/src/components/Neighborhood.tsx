@@ -7,17 +7,18 @@ type NeighborhoodProps = {
     neighborhood: Neighborhood;
     onHover: (id: number[]) => void;
     offHover: (id: number[]) => void;
+    onClick: (name: string) => void;
 };
 
-export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodProps) {
+export function Neighborhood({ neighborhood, onHover, offHover, onClick }: NeighborhoodProps) {
     // 🔹 typed ref
     const gRef = useRef<SVGGElement | null>(null);
 
-    const {registry, reset_registry} = useContext(NeighborhoodsContext);
+    const { registry, reset_registry } = useContext(NeighborhoodsContext);
     const [enabled, setEnabled] = useState(false);
     const [color, setColor] = useState("lightgrey");
     const [showName, setShowName] = useState(false);
-    const [greyedOut, setGreyedOut] =useState(false)
+    const [greyedOut, setGreyedOut] = useState(false)
     const [hovered, setHovered] = useState(false);
     const [offset, setOffset] = useState(0);
 
@@ -34,12 +35,12 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
             setEnabled,
             setColor,
             setShowName,
-            setGreyedOut,  
-            wiggle, 
+            setGreyedOut,
+            wiggle,
         };
         return () => delete registry[neighborhood.id];
     }, []);
-    
+
 
     useEffect(() => {
         if (neighborhood.polygons.length === 0) return;
@@ -79,8 +80,8 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
 
         requestAnimationFrame(animate);
     }, [hovered, enabled]);
-    function wiggle(){
-        
+    function wiggle() {
+
         const duration = 400;
         const amplitude = 2;
         let start: number | null = null;
@@ -106,13 +107,14 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
                 }
                 onHover(neighborhood.borders);
             }}
+            onClick={() => onClick(neighborhood.name)}
             onMouseLeave={() => {
                 setHovered(false);
                 offHover(neighborhood.borders);
             }}
             style={{
                 cursor: enabled ? "pointer" : "auto",
-                opacity: greyedOut ? 0.4 : 1, 
+                opacity: greyedOut ? 0.4 : 1,
                 transition: "opacity 150ms ease",
             }}
             transform={`translate(0, ${offset})`}
