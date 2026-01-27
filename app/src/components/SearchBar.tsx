@@ -18,9 +18,14 @@ export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
+const isCoarsePointer =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(pointer: coarse)').matches
 
 useEffect(() => {
-  const handler = (e: MouseEvent | TouchEvent) => {
+  if (isCoarsePointer) return
+
+  const handler = (e: MouseEvent) => {
     if (!wrapperRef.current) return
     if (!wrapperRef.current.contains(e.target as Node)) {
       setOpen(false)
@@ -29,13 +34,9 @@ useEffect(() => {
   }
 
   document.addEventListener('mousedown', handler)
-  document.addEventListener('touchstart', handler)
+  return () => document.removeEventListener('mousedown', handler)
+}, [isCoarsePointer])
 
-  return () => {
-    document.removeEventListener('mousedown', handler)
-    document.removeEventListener('touchstart', handler)
-  }
-}, [])
 
   const baseOptions = useMemo(
     () =>

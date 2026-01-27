@@ -216,6 +216,7 @@ function AppInner({ debug = false, practice = false }) {
     registry[value].setGreyedOut(true)
     registry[value].setEnabled(true)
     registry[value].setShowName(true)
+    registry[value].wiggle()
 
     var color_code = null;
     if (!is_hint) color_code = determineScore(value);

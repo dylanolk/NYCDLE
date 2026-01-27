@@ -34,7 +34,8 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
             setEnabled,
             setColor,
             setShowName,
-            setGreyedOut,   
+            setGreyedOut,  
+            wiggle, 
         };
         return () => delete registry[neighborhood.id];
     }, []);
@@ -78,7 +79,22 @@ export function Neighborhood({ neighborhood, onHover, offHover }: NeighborhoodPr
 
         requestAnimationFrame(animate);
     }, [hovered, enabled]);
+    function wiggle(){
+        
+        const duration = 400;
+        const amplitude = 2;
+        let start: number | null = null;
 
+        const animate = (timestamp: number) => {
+            if (!start) start = timestamp;
+            const t = Math.min((timestamp - start) / duration, 1);
+            setOffset(Math.sin(t * Math.PI) * amplitude);
+            if (t < 1) requestAnimationFrame(animate);
+            else setOffset(0);
+        };
+
+        requestAnimationFrame(animate);
+    }
     return (
         <g
             ref={gRef}
