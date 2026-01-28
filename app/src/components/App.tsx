@@ -456,7 +456,7 @@ function AppInner({ debug = false, practice = false }) {
 
 }
 
-const COORDS_CACHE_KEY = 'coords_v2';
+const COORDS_CACHE_KEY = 'coords_v3';
 
 async function fetchData() {
 

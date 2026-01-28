@@ -54,6 +54,10 @@ _MANUAL_NEIGHBORHOOD_BORDERS_TO_ADD: list[list[str]] = [
 
 ]
 
+_MANUAL_NEIGHBORHOOD_BORDERS_TO_REMOVE: list[list[int]] = [
+    ['College Point', 'LaGuardia Airport']
+]
+
 
 
 neighborhoods: list[Neighborhood] = NeighborhoodSchema().load(data, many=True)
@@ -90,7 +94,12 @@ for neighborhood in neighborhoods:
         ]
         if not set(all_coords_a).isdisjoint(all_coords_b):
             borders.append(neighborhood_b.id)
+    ## remove borders 
+    borders_to_remove = get_manual_borders(neighborhood, _MANUAL_NEIGHBORHOOD_BORDERS_TO_REMOVE)
+    borders = [border for border in borders if border not in borders_to_remove]
     neighborhood.borders = borders
+
+
 
 
 with open("app/public/coords.json", "w") as file:
