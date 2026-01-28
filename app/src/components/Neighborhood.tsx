@@ -83,6 +83,7 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick, debug =
                 opacity: greyedOut ? 0.4 : 1,
                 transition: "opacity 150ms ease",
             }}
+            onClick={() => onClick(neighborhood.name)}
             onPointerEnter={(e) => {
                 if (e.pointerType === "touch") return; // optional, see note below
 
