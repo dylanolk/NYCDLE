@@ -4,21 +4,36 @@ import { COLORS } from "../constants";
 type ToolTipProps = {
     label: string;
     open: boolean;
+    mousePos: {};
 };
 
-export function ToolTip({ label = "", open = true }: ToolTipProps) {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+export function ToolTip({ label = "", open = false, mousePos }: ToolTipProps) {
+    const [mousePosition, setMousePosition] = useState({ x: mousePos.x, y: mousePos.y });
     const tipRef = useRef<HTMLDivElement | null>(null);
     const [size, setSize] = useState({ w: 0, h: 0 });
+    const prevLabel = useRef("")
 
     // Track mouse
     useEffect(() => {
-        const handleMove = (e: MouseEvent) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
+        const handleMove = (e: PointerEvent) => {
+            if (e.pointerType != "touch") {
+                setMousePosition({ x: e.clientX, y: e.clientY });
+                prevLabel.current = label
+            }
         };
-        document.addEventListener("mousemove", handleMove);
-        return () => document.removeEventListener("mousemove", handleMove);
-    }, []);
+
+        document.addEventListener("pointermove", handleMove);
+        prevLabel.current = label;
+        return () => {
+            document.removeEventListener("pointermove", handleMove);
+        };
+    }, [label]);
+    useEffect(() => {
+        prevLabel.current = label;
+    }, [label]);
+    useEffect(() => {
+        setMousePosition(mousePos);
+    }, [mousePos]);
 
     // Measure tooltip size
     useEffect(() => {

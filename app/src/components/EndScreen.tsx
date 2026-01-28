@@ -57,16 +57,16 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
     var hint_counter = 0
     if (!gameState.gave_up) {
         emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
-        text_to_copy = "I just beat" + (!practice ? " today's daily burrow!" : ` a practice burrow from ${neighborhoodsDict[gameState.start_neighborhood_id]?.name} to ${neighborhoodsDict[gameState.end_neighborhood_id]?.name}`)+'\n'+emoji_string
+        text_to_copy = "I just beat" + (!practice ? " today's daily burrow!" : ` a practice burrow from ${neighborhoodsDict[gameState.start_neighborhood_id]?.name} to ${neighborhoodsDict[gameState.end_neighborhood_id]?.name}`) + '\n' + emoji_string
         hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length + gameState.showed_outlines
-        if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hint` + (hint_counter>1 ?  "s!": "!")
+        if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hint` + (hint_counter > 1 ? "s!" : "!")
         text_to_copy += "\nburrow.dylanolk.com"
     }
     else {
         emoji_string = gameState.color_tracker.map((c) => emoji_dict[c]).join('')
         text_to_copy = `I just finished today's daily burrow!\n${emoji_string}`
         hint_counter = gameState.color_tracker.filter((c) => c == ColorCodes.Hint).length + gameState.showed_outlines
-        if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hint` + (hint_counter>1 ?  "s!": "!")
+        if (hint_counter) text_to_copy += `\nand I used ${hint_counter} hint` + (hint_counter > 1 ? "s!" : "!")
         if (gameState.color_tracker.length) text_to_copy += "\n...and then I gave up!"
         else text_to_copy += "\n...I didn't even try!"
         text_to_copy += "\nburrow.dylanolk.com"
@@ -102,21 +102,21 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                 }}
             >
 
-<DialogPanel
-    style={{
-        width: window.innerWidth <= 820 ? "90%" : "30%",
-        maxHeight: '80vh',
-        padding: T.space.lg,
-        borderRadius: T.radius.lg,
-        background: COLORS.dark_blue,
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 30px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
-        alignItems: 'center',
-        overflowY: 'auto',
-        scrollbarWidth: 'thin',
-    }}
->
+                <DialogPanel
+                    style={{
+                        width: window.innerWidth <= 820 ? "90%" : "30%",
+                        maxHeight: '80vh',
+                        padding: T.space.lg,
+                        borderRadius: T.radius.lg,
+                        background: COLORS.dark_blue,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxShadow: '0 30px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.6)',
+                        alignItems: 'center',
+                        overflowY: 'auto',
+                        scrollbarWidth: 'thin',
+                    }}
+                >
 
                     <DialogTitle style={{ color: COLORS.lifted_background, fontSize: '28px', fontWeight: 800 }}>
                         {gameState.gave_up ? "Better luck next time" : "🎉 You Did It!"}
@@ -126,12 +126,12 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                         {(gameState.gave_up ? "You gave up on" : "You completed") + (!practice ? " today's burrow!" : " a practice burrow!")}
                     </Description>
 
-                   
+
                     {
-                        practice? null:
-                        <Description style = {{color: COLORS.lifted_background}}>
-                            Come back tomorrow for a new challenge!
-                        </Description>
+                        practice ? null :
+                            <Description style={{ color: COLORS.lifted_background }}>
+                                Come back tomorrow for a new challenge!
+                            </Description>
                     }
 
 
@@ -183,15 +183,15 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                     >
                         Close
                     </button>
-                     <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
+                    <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
                         Your route: <span style={{ color: COLORS.deep_red }}>
                             {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
                         </span>
 
                         {Object.keys(neighborhoodsDict).length ? (
                             gameState.neighborhoods_guessed.map((id, index) => (
-                                <span>
-                                    <span key={index} style={{ color: gameState.color_tracker[index] == ColorCodes.Hint ? COLORS.background_color : gameState.color_tracker[index] }}>
+                                <span key={index}>
+                                    < span style={{ color: gameState.color_tracker[index] == ColorCodes.Hint ? COLORS.background_color : gameState.color_tracker[index] }}>
                                         {neighborhoodsDict[id].name + ' → '}
                                     </span>
                                 </span>
@@ -212,8 +212,8 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
 
                             {Object.keys(neighborhoodsDict).length ? (
                                 optimalRoute.map((id, index) => (
-                                    index < optimalRoute.length - 1 ? (<span>
-                                        <span key={index} style={{ color: COLORS.logo_color }}>
+                                    index < optimalRoute.length - 1 ? (<span key={index}>
+                                        < span style={{ color: COLORS.logo_color }}>
                                             {neighborhoodsDict[id].name + ' → '}
                                         </span>
                                     </span>) : <span key={index}></span>
@@ -227,7 +227,7 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                     }
 
                 </DialogPanel>
-            </div>
+            </div >
         </Dialog >
     )
 }

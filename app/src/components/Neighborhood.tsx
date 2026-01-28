@@ -94,7 +94,7 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick, debug =
                 }
 
                 if (debug) onHover(neighborhood.borders);
-                else if (enabled) onHover(neighborhood.name);
+                else if (enabled) onHover(neighborhood.name, e.clientX, e.clientY);
             }}
             onPointerLeave={(e) => {
                 if (e.pointerType === "touch") return;
@@ -106,22 +106,22 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick, debug =
             }}
             onPointerDown={(e) => {
                 if (e.pointerType === "touch") {
-                    toolTipLock.current += 1
-                    const my_tool_tip_lock = toolTipLock.current
-                    setHovered(true);
-
-
-                    if (debug) onHover(neighborhood.borders);
-                    else if (enabled) onHover(neighborhood.name);
-                    setTimeout(() => {
-                        if (my_tool_tip_lock == toolTipLock.current) {
-                            if (debug) offHover(neighborhood.borders);
-                            else if (enabled) offHover();
-
-
-                        }
-                    }, 2000);
-                    setHovered(false);
+                    if (enabled) {
+                        setHovered(true);
+                        toolTipLock.current += 1
+                        const my_tool_tip_lock = toolTipLock.current
+                        if (debug) onHover(neighborhood.borders);
+                        else onHover(neighborhood.name, e.clientX, e.clientY);
+                        setTimeout(() => {
+                            if (my_tool_tip_lock == toolTipLock.current) {
+                                if (debug) offHover(neighborhood.borders);
+                                else {
+                                    offHover();
+                                }
+                            }
+                        }, 2000);
+                        setHovered(false);
+                    }
                 }
             }}
         >

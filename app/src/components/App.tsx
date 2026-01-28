@@ -100,6 +100,7 @@ function AppInner({ debug = false, practice = false }) {
   const { registry, reset_registry } = useContext(NeighborhoodsContext)
   const [toolTipLabel, setToolTipLabel] = useState("")
   const [toolTipOpen, setToolTipOpen] = useState(false)
+  const [cursorXY, setCursorXY] = useState({ x: 0, y: 0 })
 
   function resetGame() {
     Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(false))
@@ -211,7 +212,10 @@ function AppInner({ debug = false, practice = false }) {
   const wrapperRef = useRef(null)
 
   function addNeighborhood(value, is_hint = false) {
-    if (gameState.neighborhoods_guessed.includes(value)) return;
+    if ([...gameState.neighborhoods_guessed, gameState.start_neighborhood_id, gameState.end_neighborhood_id].includes(value)) {
+      registry[value].wiggle()
+      return;
+    }
     if (gameState.finished) return;
     if (value == gameState.start_neighborhood_id || value == gameState.end_neighborhood_id) {
       return
@@ -340,8 +344,7 @@ function AppInner({ debug = false, practice = false }) {
 
 
   const wrapper: CSSProperties = {
-    minHeight: "130svh",
-    maxHeight: "200svh",
+    height: '130svh',
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -384,9 +387,10 @@ function AppInner({ debug = false, practice = false }) {
   async function copyToClipboard(name) {
     await navigator.clipboard.writeText(name)
   }
-  const handleHover = useCallback((name: string) => {
+  const handleHover = useCallback((name: string, x_pos = 0, y_pos = 0) => {
     setToolTipLabel(name);
     setToolTipOpen(true);
+    setCursorXY({ x: x_pos, y: y_pos });
   }, []);
 
   const handleOffHover = useCallback(() => {
@@ -421,7 +425,7 @@ function AppInner({ debug = false, practice = false }) {
     <div ref={wrapperRef} style={wrapper}>
       <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => { resetGame(); navigate('/practice') }} showHome={() => { navigate('/') }} practice={practice} />
       <div style={middle_div}>
-        <ToolTip label={toolTipLabel} open={toolTipOpen} />
+        <ToolTip label={toolTipLabel} open={toolTipOpen} mousePos={cursorXY} />
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} practice={practice} showPracticeSettings={() => setShowPracticeSettings(true)} onHover={handleHover} offHover={handleOffHover} />
         {!gameState.finished ? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} /> : <ResultsButton showResults={() => setEndScreenVisible(true)} />}
