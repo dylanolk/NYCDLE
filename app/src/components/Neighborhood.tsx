@@ -8,9 +8,11 @@ type NeighborhoodProps = {
     onHover: (id: number[]) => void;
     offHover: (id: number[]) => void;
     onClick: (name: string) => void;
+    debug: boolean;
+    toolTipLock: number;
 };
 
-export function Neighborhood({ neighborhood, onHover, offHover, onClick }: NeighborhoodProps) {
+export function Neighborhood({ neighborhood, onHover, offHover, onClick, debug = false, toolTipLock }: NeighborhoodProps) {
     // 🔹 typed ref
     const gRef = useRef<SVGGElement | null>(null);
 
@@ -50,39 +52,15 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick }: Neigh
         setCenter({ x: x_center, y: y_top });
     }, [neighborhood]);
 
-    // 🔹 measure label text when it appears
-    useEffect(() => {
-        if (!hovered || !enabled) return;
-        if (!textRef.current) return;
-
-        const box = textRef.current.getBBox();
-        setLabelSize({
-            width: box.width,
-            height: box.height,
-        });
-    }, [hovered, enabled, neighborhood.name]);
 
     // single subtle bob on hover
     useEffect(() => {
         if (!enabled || !hovered) return;
-
-        const duration = 400;
-        const amplitude = 2;
-        let start: number | null = null;
-
-        const animate = (timestamp: number) => {
-            if (!start) start = timestamp;
-            const t = Math.min((timestamp - start) / duration, 1);
-            setOffset(Math.sin(t * Math.PI) * amplitude);
-            if (t < 1) requestAnimationFrame(animate);
-            else setOffset(0);
-        };
-
-        requestAnimationFrame(animate);
+        wiggle();
     }, [hovered, enabled]);
-    function wiggle() {
 
-        const duration = 400;
+    function wiggle() {
+        const duration = 300;
         const amplitude = 2;
         let start: number | null = null;
 
@@ -99,26 +77,55 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick }: Neigh
     return (
         <g
             ref={gRef}
-            onMouseEnter={() => {
-                setHovered(true);
-                const el = gRef.current;
-                if (el && el.parentNode && el.parentNode.lastChild !== el) {
-                    el.parentNode.appendChild(el);
-                }
-                onHover(neighborhood.borders);
-            }}
-            onClick={() => onClick(neighborhood.name)}
-            onMouseLeave={() => {
-                setHovered(false);
-                offHover(neighborhood.borders);
-            }}
+            transform={`translate(0, ${-offset})`}
             style={{
                 cursor: enabled ? "pointer" : "auto",
                 opacity: greyedOut ? 0.4 : 1,
                 transition: "opacity 150ms ease",
             }}
-            transform={`translate(0, ${offset})`}
+            onPointerEnter={(e) => {
+                if (e.pointerType === "touch") return; // optional, see note below
+
+                setHovered(true);
+
+                const el = gRef.current;
+                if (el && el.parentNode && el.parentNode.lastChild !== el) {
+                    el.parentNode.appendChild(el);
+                }
+
+                if (debug) onHover(neighborhood.borders);
+                else if (enabled) onHover(neighborhood.name);
+            }}
+            onPointerLeave={(e) => {
+                if (e.pointerType === "touch") return;
+
+                setHovered(false);
+
+                if (debug) offHover(neighborhood.borders);
+                else if (enabled) offHover();
+            }}
+            onPointerDown={(e) => {
+                if (e.pointerType === "touch") {
+                    toolTipLock.current += 1
+                    const my_tool_tip_lock = toolTipLock.current
+                    setHovered(true);
+
+
+                    if (debug) onHover(neighborhood.borders);
+                    else if (enabled) onHover(neighborhood.name);
+                    setTimeout(() => {
+                        if (my_tool_tip_lock == toolTipLock.current) {
+                            if (debug) offHover(neighborhood.borders);
+                            else if (enabled) offHover();
+
+
+                        }
+                    }, 2000);
+                    setHovered(false);
+                }
+            }}
         >
+
             {neighborhood.polygons.map((polygon: any[], j: number) => (
                 <path
                     key={`${neighborhood.id}-${j}-halo`}
@@ -137,43 +144,6 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick }: Neigh
                     stroke="transparent"
                 />
             ))}
-
-            {/* 🔹 Auto-sized hover label */}
-            {hovered && enabled && showName && (
-                <g transform={`translate(${center.x}, ${center.y - 14})`}>
-                    <rect
-                        x={-(labelSize.width / 2) - 8}
-                        y={-(labelSize.height / 2) - 6}
-                        width={labelSize.width + 16}
-                        height={labelSize.height + 12}
-                        rx={6}
-                        ry={6}
-                        fill="white"
-                        stroke="#ccc"
-                        strokeWidth={0.5}
-                        opacity={0.95}
-                        style={{
-                            filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.2))",
-                        }}
-                    />
-                    <text
-                        ref={textRef}
-                        x={0}
-                        y={0}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        style={{
-                            fontSize: "10px",
-                            fontWeight: 500,
-                            fill: "#333",
-                            pointerEvents: "none",
-                            fontFamily: "sans-serif",
-                        }}
-                    >
-                        {neighborhood.name}
-                    </text>
-                </g>
-            )}
         </g>
     );
 }

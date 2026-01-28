@@ -13,6 +13,7 @@ type NeighborhoodProps = {
     showPracticeSettings: () => void;
     practice: boolean;
     onClick: (name: string) => void;
+    debug: boolean;
 };
 
 export function MapDisplay({
@@ -23,13 +24,14 @@ export function MapDisplay({
     showPracticeSettings = () => null,
     practice = false,
     onClick = () => null,
+    debug = false,
 }: NeighborhoodProps) {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const gRef = useRef<SVGGElement | null>(null);
     const [resetCounter, setResetCounter] = useState(0)
     const [screenMoved, setScreenMoved] = useState(false)
     const firstRender = useRef(true);
-    const programaticZoom = useRef(false);
+    const toolTipLock = useRef(0);
 
     const styles = {
         box: {
@@ -96,7 +98,6 @@ export function MapDisplay({
                 firstRender.current = false;
                 setScreenMoved(false);
             } else {
-
                 svg.transition().duration(750).call(zoom_behavior.transform, transform).on('end');
                 setScreenMoved(false);
             }
@@ -178,6 +179,8 @@ export function MapDisplay({
                             onHover={onHover}
                             offHover={offHover}
                             onClick={onClick}
+                            debug={debug}
+                            toolTipLock={toolTipLock}
                         />
                     ))}
                 </g>

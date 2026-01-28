@@ -1,6 +1,6 @@
 import { MapDisplay } from './MapDisplay.tsx'
 import { SearchBar } from './SearchBar.tsx'
-import { CSSProperties } from 'react';
+import { CSSProperties, useCallback, useMemo } from 'react';
 import { useEffect, useState, useRef, useContext } from "react";
 import { NeighborhoodListSchema } from '../schemas/NeighborhoodSchema'
 import { NeighborhoodsContext } from '../contexts/NeighborhoodsContext.tsx';
@@ -17,7 +17,7 @@ import { COLORS } from '../constants.tsx'
 import { preconnect } from 'react-dom';
 import { ResultsButton } from './ResultsButton.tsx';
 import { PracticeSettings } from './PracticeSettings.tsx';
-
+import { ToolTip } from './ToolTip.tsx';
 export enum ColorCodes {
   Good = COLORS.logo_color,
   Close = "orange",
@@ -98,6 +98,8 @@ function AppInner({ debug = false, practice = false }) {
     }
   })
   const { registry, reset_registry } = useContext(NeighborhoodsContext)
+  const [toolTipLabel, setToolTipLabel] = useState("")
+  const [toolTipOpen, setToolTipOpen] = useState(false)
 
   function resetGame() {
     Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(false))
@@ -382,8 +384,19 @@ function AppInner({ debug = false, practice = false }) {
   async function copyToClipboard(name) {
     await navigator.clipboard.writeText(name)
   }
+  const handleHover = useCallback((name: string) => {
+    setToolTipLabel(name);
+    setToolTipOpen(true);
+  }, []);
 
-  const enabled_neighborhoods_ids = Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed].filter(id => id !== null)));
+  const handleOffHover = useCallback(() => {
+    setToolTipOpen(false);
+  }, []);
+  const enabled_neighborhoods_ids = useMemo(
+    () => Array.from(new Set([gameState.start_neighborhood_id, gameState.end_neighborhood_id, ...gameState.neighborhoods_guessed])).filter(id => id !== null),
+    [gameState.start_neighborhood_id, gameState.end_neighborhood_id, gameState.neighborhoods_guessed]
+  );
+
   const start_neighborhood_name = gameState.start_neighborhood_id !== null && neighborhoodsDict[gameState.start_neighborhood_id] ? neighborhoodsDict[gameState.start_neighborhood_id].name : 'Loading...'
   const end_neighborhood_name = gameState.end_neighborhood_id !== null && neighborhoodsDict[gameState.end_neighborhood_id] ? neighborhoodsDict[gameState.end_neighborhood_id].name : 'Loading...'
   const boroNames: string[] = Array.from(new Set(neighborhoods.map(neighborhood => neighborhood.boroname)))
@@ -393,7 +406,7 @@ function AppInner({ debug = false, practice = false }) {
         <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => navigate('/practice')} showHome={() => navigate('/')} practice={practice} />
         <div style={middle_div}>
           <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
-          <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={neighborhoods.map(neighborhood => neighborhood.id)} onHover={red_neighborhoods} offHover={grey_neighborhoods} onClick={copyToClipboard} />
+          <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={neighborhoods.map(neighborhood => neighborhood.id)} onHover={red_neighborhoods} offHover={grey_neighborhoods} onClick={copyToClipboard} debug={true} />
           {!gameState.finished ? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} /> : <ResultsButton showResults={() => setEndScreenVisible(true)} />}
           <InfoScreen showInfoScreen={showInfoScreen} onClose={() => setShowInfoScreen(false)} />
         </div>
@@ -404,11 +417,13 @@ function AppInner({ debug = false, practice = false }) {
     )
   }
   return (
+
     <div ref={wrapperRef} style={wrapper}>
       <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => { resetGame(); navigate('/practice') }} showHome={() => { navigate('/') }} practice={practice} />
       <div style={middle_div}>
+        <ToolTip label={toolTipLabel} open={toolTipOpen} />
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
-        <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} practice={practice} showPracticeSettings={() => setShowPracticeSettings(true)} />
+        <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} practice={practice} showPracticeSettings={() => setShowPracticeSettings(true)} onHover={handleHover} offHover={handleOffHover} />
         {!gameState.finished ? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} /> : <ResultsButton showResults={() => setEndScreenVisible(true)} />}
         <EndScreen
           endScreenVisible={endScreenVisible}
