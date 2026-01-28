@@ -47,8 +47,6 @@ export function ToolTip({ label = "", open = false, mousePos }: ToolTipProps) {
 
     // Treat x,y as the CENTER of tooltip because of translate(-50%, 0)
     let x = mousePosition.x;
-    console.log("x1: ", x)
-    console.log("size: ", size)
     let y = mousePosition.y - size.h - 14; // above cursor
 
     const halfW = size.w / 2;
@@ -60,7 +58,6 @@ export function ToolTip({ label = "", open = false, mousePos }: ToolTipProps) {
     const maxCenterX = window.innerWidth - margin - halfW;
 
     x = Math.min(Math.max(x, minCenterX), maxCenterX);
-    console.log(x)
 
     // ---- VERTICAL CLAMP ----
     // If above cursor goes off top → flip below
