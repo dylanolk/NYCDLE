@@ -44,7 +44,7 @@ export function App() {
   return (
     <NeighborhoodsContext.Provider value={{ registry, reset }}>
       <Routes>
-        <Route path="/" element={<AppInner key={new Date().getTime()} />} />
+        <Route path="/" element={<AppInner />} />
         <Route path='/debug' element={<AppInner debug={true} />} />
         <Route path='/practice' element={<AppInner practice={true} />} />
       </Routes>
@@ -79,24 +79,7 @@ function AppInner({ debug = false, practice = false }) {
   const [practiceSettings, setPracticeSettings] = useState({
     enabled_boros: []
   })
-  const [gameState, setGameState] = useState(() => {
-    try {
-      let date = new Date()
-      let day = date.getDate() + 1;
-      let month = date.getMonth() + 1;
-      let year = date.getFullYear();
-      let currentDate = `${day}-${month}-${year}`;
-      let saved = localStorage.getItem('gameState')
-
-      if (!practice && !debug && saved && (JSON.parse(saved)["date"] != currentDate)) {
-        localStorage.clear();
-        saved = null;
-      }
-      return saved && !practice ? JSON.parse(saved) : _INITIAL_GAME_STATE
-    } catch {
-      return _INITIAL_GAME_STATE
-    }
-  })
+  const [gameState, setGameState] = useState(loadSavedGameState() || _INITIAL_GAME_STATE)
   const { registry, reset_registry } = useContext(NeighborhoodsContext)
   const [toolTipLabel, setToolTipLabel] = useState("")
   const [toolTipOpen, setToolTipOpen] = useState(false)
@@ -113,6 +96,7 @@ function AppInner({ debug = false, practice = false }) {
       setGameState(_INITIAL_GAME_STATE);
     }
     randomizeRoute(state, setGameState, neighborhoods, neighborhoodsDict, practice, practiceSettings.enabled_boros)
+    savedGameStateApplied.current = false
   }
 
   useEffect(() => {
@@ -125,59 +109,19 @@ function AppInner({ debug = false, practice = false }) {
     fetchNeighborhoods();
   }, []);
 
-  useEffect(() => { resetGame(); console.log("YO!") }, [location.pathname])
+  useEffect(() => { resetGame(); }, [location.pathname])
 
   // Apply saved game state
   const savedGameStateApplied = useRef(false);
 
   useEffect(() => {
-    if (!registry) return;
-    // Wait for all neighborhoods to be registered. 
-    if (!neighborhoods.length) return;
-    if (!neighborhoods.every(
-      n => registry[n.id] !== undefined
-    )) {
-      return;
-    }
-    if (debug) {
-      setAllEnabled();
-      return;
-    }
-
-    if (savedGameStateApplied.current) return;
-    savedGameStateApplied.current = true
-    if (practice) {
-      setAllDisabled();
-      return;
-    }
-    if (gameState.finished) {
-      setAllEnabled();
-      setEndScreenVisible(true);
-    }
-
-    if (gameState.showed_outlines) {
-      Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(true))
-    }
-    for (let i = 0; i < gameState.neighborhoods_guessed.length; i++) {
-      const id = gameState.neighborhoods_guessed[i];
-      const color_code = gameState.color_tracker[i];
-      if (registry[id]) {
-        if (!gameState.finished) registry[id].setGreyedOut(true);
-        registry[id].setColor(color_code);
-        registry[id].setEnabled(true);
-        registry[id].setShowName(true)
-      }
-    }
-    isRouteDone()
-
+    loadAndApplySavedGameState();
   }, [gameState, registry]);
 
   useEffect(() => {
     if (debug || practice) return;
     localStorage.setItem("gameState", JSON.stringify(gameState))
   }, [gameState]);
-
-
 
   useEffect(() => {
     if (!neighborhoods) {
@@ -211,6 +155,66 @@ function AppInner({ debug = false, practice = false }) {
   }, [practiceSettings.enabled_boros])
   const wrapperRef = useRef(null)
 
+  function loadAndApplySavedGameState() {
+    var loaded_game_state = loadSavedGameState() || gameState;
+    if (!registry) return;
+    // Wait for all neighborhoods to be registered. 
+    if (!neighborhoods.length) return;
+    if (!neighborhoods.every(
+      n => registry[n.id] !== undefined
+    )) {
+      return;
+    }
+    if (debug) {
+      setAllEnabled();
+      return;
+    }
+
+    if (savedGameStateApplied.current) return;
+    savedGameStateApplied.current = true
+    if (practice) {
+      setAllDisabled();
+      return;
+    }
+    if (loaded_game_state.finished) {
+      setAllEnabled();
+      setEndScreenVisible(true);
+    }
+
+    if (loaded_game_state.showed_outlines) {
+      Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(true))
+    }
+    for (let i = 0; i < loaded_game_state.neighborhoods_guessed.length; i++) {
+      const id = loaded_game_state.neighborhoods_guessed[i];
+      const color_code = loaded_game_state.color_tracker[i];
+      if (registry[id]) {
+        if (!loaded_game_state.finished) registry[id].setGreyedOut(true);
+        registry[id].setColor(color_code);
+        registry[id].setEnabled(true);
+        registry[id].setShowName(true)
+      }
+    }
+    setGameState(loaded_game_state)
+    isRouteDone([loaded_game_state.start_neighborhood_id, ...loaded_game_state.neighborhoods_guessed, loaded_game_state.end_neighborhood_id])
+  }
+
+  function loadSavedGameState() {
+    try {
+      let date = new Date()
+      let day = date.getDate() + 1;
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+      let currentDate = `${day}-${month}-${year}`;
+      let saved = localStorage.getItem('gameState')
+      if (!practice && !debug && saved && (JSON.parse(saved)["date"] != currentDate)) {
+        localStorage.removeItem('gameState');
+        saved = null;
+      }
+      return (saved && !practice) ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  }
   function addNeighborhood(value, is_hint = false) {
     if ([...gameState.neighborhoods_guessed, gameState.start_neighborhood_id, gameState.end_neighborhood_id].includes(value)) {
       registry[value].wiggle()
@@ -236,7 +240,7 @@ function AppInner({ debug = false, practice = false }) {
     })
 
 
-    if (isRouteDone(value)) {
+    if (isRouteDone([gameState.start_neighborhood_id, ...gameState.neighborhoods_guessed, value, gameState.end_neighborhood_id])) {
       setEndScreenVisible(true);
       setAllEnabled();
       setGameState({
@@ -316,15 +320,15 @@ function AppInner({ debug = false, practice = false }) {
   }
 
 
-  function isRouteDone(last_guess) {
+  function isRouteDone(route) {
     // DFS of neighborhoods (only checking ones that have been guessed)
-    let stack = [gameState.start_neighborhood_id]
-    const visited = new Set([gameState.start_neighborhood_id]);
-    const guessed = gameState.neighborhoods_guessed.concat([last_guess, gameState.end_neighborhood_id])
+    let stack = [route[0]]
+    const visited = new Set([route[0]]);
+    const guessed = route.slice(1, route.length)
 
     while (stack.length > 0) {
       const current = stack.pop()
-      if (current === gameState.end_neighborhood_id) {
+      if (current === route[route.length - 1]) {
         return true;
       }
       const current_neighborhood = neighborhoodsDict[current]
@@ -423,7 +427,13 @@ function AppInner({ debug = false, practice = false }) {
   return (
 
     <div ref={wrapperRef} style={wrapper}>
-      <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => { resetGame(); navigate('/practice') }} showHome={() => { navigate('/') }} practice={practice} />
+      <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => {
+        if (location.pathname === "/practice") {
+          resetGame();
+        } else {
+          navigate("/practice");
+        }
+      }} showHome={() => { loadAndApplySavedGameState(); navigate('/'); }} practice={practice} />
       <div style={middle_div}>
         <ToolTip label={toolTipLabel} open={toolTipOpen} mousePos={cursorXY} />
         <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} practice={practice} />

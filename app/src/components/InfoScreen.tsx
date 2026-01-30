@@ -153,17 +153,17 @@ export function InfoScreen({ showInfoScreen, onClose }: InfoScreenProps) {
                                     marginBottom: T.space.lg,
                                 }}
                             >
-                                <p style={{ marginBottom: T.space.xs }}>
+                                <span style={{ marginBottom: T.space.xs }}>
                                     Connect the <span style={{ color: COLORS.pale_red, fontWeight: 700 }}>starting neighborhood </span>
                                     to the <span style={{ color: COLORS.blue, fontWeight: 700 }}> ending neighborhood </span>
                                     in as few moves as possible.
-                                </p>
-                                <p>
+                                </span>
+                                <span>
                                     Neighborhoods are colored <br /> <span style={{ color: COLORS.logo_color, fontWeight: 700 }}>green</span> if they get you closer,<br />
                                     <span style={{ color: 'orange', fontWeight: 700 }}> orange </span> if you've got the right idea,<br />
-                                    and <span style={{ color: COLORS.deep_red, fontWeight: 700 }}> red </span> if you weren't close.<br/>
-                                    Neighborhoods that don't connect to the <span style = {{color: COLORS.pale_red, fontWeight: 700}}>starting neighborhood</span> are greyed out. 
-                                </p>
+                                    and <span style={{ color: COLORS.deep_red, fontWeight: 700 }}> red </span> if you weren't close.<br />
+                                    Neighborhoods that don't connect to the <span style={{ color: COLORS.pale_red, fontWeight: 700 }}>starting neighborhood</span> are greyed out.
+                                </span>
                             </Description>
 
                             {/* Sections */}
