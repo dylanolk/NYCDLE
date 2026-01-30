@@ -185,14 +185,14 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                     </button>
                     <Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
                         Your route: <span style={{ color: COLORS.deep_red }}>
-                            {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
+                            {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name : null} <span style={{ color: COLORS.lifted_background }}>  →  </span>
                         </span>
 
                         {Object.keys(neighborhoodsDict).length ? (
                             gameState.neighborhoods_guessed.map((id, index) => (
                                 <span key={index}>
                                     < span style={{ color: gameState.color_tracker[index] == ColorCodes.Hint ? COLORS.background_color : gameState.color_tracker[index] }}>
-                                        {neighborhoodsDict[id].name + ' → '}
+                                        {neighborhoodsDict[id].name} <span style={{ color: COLORS.lifted_background }}>  →  </span>
                                     </span>
                                 </span>
                             ))
@@ -207,14 +207,14 @@ export function EndScreen({ endScreenVisible, onClose, gameState, neighborhoodsD
                     {gameState.neighborhoods_guessed.length != optimalRoute.length - 1 ?
                         (<Description style={{ color: COLORS.lifted_background, marginBottom: '16px' }}>
                             You could've done: <span style={{ color: COLORS.deep_red }}>
-                                {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name + ' → ' : null}
+                                {Object.keys(neighborhoodsDict).length ? neighborhoodsDict[gameState.start_neighborhood_id]?.name : null}<span style={{ color: COLORS.lifted_background }}>  →  </span>
                             </span>
 
                             {Object.keys(neighborhoodsDict).length ? (
                                 optimalRoute.map((id, index) => (
                                     index < optimalRoute.length - 1 ? (<span key={index}>
                                         < span style={{ color: COLORS.logo_color }}>
-                                            {neighborhoodsDict[id].name + ' → '}
+                                            {neighborhoodsDict[id].name} <span style={{ color: COLORS.lifted_background }}>  →  </span>
                                         </span>
                                     </span>) : <span key={index}></span>
                                 ))

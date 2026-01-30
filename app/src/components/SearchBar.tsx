@@ -1,6 +1,87 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
 import { COLORS } from '../constants'
+import fuzzysort from 'fuzzysort'
+
+function scoreSegment(segment: string, tokens: string[]) {
+  let score = 0
+  let matchedTokens = 0
+
+  const lowerSegment = segment.toLowerCase()
+
+  for (const token of tokens) {
+    const res = fuzzysort.single(token, lowerSegment)
+    if (!res) continue
+
+    matchedTokens++
+
+    score += res.score
+
+    // Word boundary boost
+    const firstIdx = res.indexes[0]
+    if (
+      firstIdx === 0 ||
+      lowerSegment[firstIdx - 1] === ' ' ||
+      lowerSegment[firstIdx - 1] === '-' ||
+      lowerSegment[firstIdx - 1] === '_'
+    ) {
+      score += 100
+    }
+
+    // Extra: **prefix match boost** (very strong)
+    if (lowerSegment.startsWith(token)) {
+      score += 500 // tweak as needed
+    }
+
+    // Extra: longer consecutive runs
+    let run = 1
+    for (let i = 1; i < res.indexes.length; i++) {
+      if (res.indexes[i] === res.indexes[i - 1] + 1) run++
+    }
+    score += run * 10
+  }
+
+  // Penalize extra words
+  const extraWords = segment.split(/\s+/).length - matchedTokens
+  score -= extraWords * 20
+
+  // Extra: make exact full token match bubble to top
+  if (matchedTokens === tokens.length) score += 1000
+
+  return score
+}
+
+
+function splitHyphen(label: string) {
+  return label.split('-').map(s => s.trim())
+}
+
+function tokenizedHyphenFuzzy(label: string, query: string) {
+  const tokens = query.toLowerCase().split(/\s+/).filter(Boolean)
+  const segments = splitHyphen(label.toLowerCase())
+
+  let bestScore = -Infinity
+  let bestSegmentIndex = 0
+
+  for (let i = 0; i < segments.length; i++) {
+    const s = segments[i]
+    const score = scoreSegment(s, tokens)
+
+    // Prefer higher score; tie-break: earlier segment wins
+    if (score > bestScore) {
+      bestScore = score
+      bestSegmentIndex = i
+    }
+  }
+
+  return {
+    score: bestScore,
+    segmentIndex: bestSegmentIndex,
+    length: label.length,
+  }
+}
+
+
 
 type Neighborhood = {
   id: string | number
@@ -11,13 +92,32 @@ type SearchBarProps = {
   neighborhoods: Neighborhood[]
   addNeighborhood: CallableFunction
   wrapperRef: any
+  practice: boolean
 }
 
-export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
+export function SearchBar({ neighborhoods, addNeighborhood, practice = false }: SearchBarProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
   const [inputValue, setInputValue] = useState('')
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName
+      const isInput =
+        tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable
+
+      if (!isInput) {
+        // Focus the search input
+        inputRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   useEffect(() => {
     let startX = 0
@@ -77,32 +177,36 @@ export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
     [neighborhoods]
   )
 
+
+
   const sortedOptions = useMemo(() => {
-    const query = inputValue.toLowerCase()
+    const query = inputValue.trim().toLowerCase()
+    if (!query) return [...baseOptions].sort((a, b) => a.label.localeCompare(b.label))
 
-    if (!query) {
-      return [...baseOptions].sort((a, b) =>
-        a.label.localeCompare(b.label)
-      )
-    }
-
-    return [...baseOptions]
-      .filter((o) => o.label.toLowerCase().includes(query))
+    return baseOptions
+      .map(o => {
+        const meta = tokenizedHyphenFuzzy(o.label, query)
+        return meta ? { ...o, _meta: meta } : null
+      })
+      .filter(Boolean)
       .sort((a, b) => {
-        const aLabel = a.label.toLowerCase()
-        const bLabel = b.label.toLowerCase()
+        // 1️⃣ Higher score wins
+        if (b!._meta.score !== a!._meta.score)
+          return b!._meta.score - a!._meta.score
 
-        const aStarts = aLabel.startsWith(query)
-        const bStarts = bLabel.startsWith(query)
-        if (aStarts !== bStarts) return aStarts ? -1 : 1
+        // 2️⃣ Earlier hyphen segment wins
+        if (a!._meta.segmentIndex !== b!._meta.segmentIndex)
+          return a!._meta.segmentIndex - b!._meta.segmentIndex
 
-        const aWord = aLabel.split(' ').some((w) => w.startsWith(query))
-        const bWord = bLabel.split(' ').some((w) => w.startsWith(query))
-        if (aWord !== bWord) return aWord ? -1 : 1
+        // 3️⃣ Shorter overall label wins (penalize superfluous words)
+        if (a!.label.length !== b!.label.length)
+          return a!.label.length - b!.label.length
 
-        return aLabel.indexOf(query) - bLabel.indexOf(query)
+        // 4️⃣ Alphabetical fallback
+        return a!.label.localeCompare(b!.label)
       })
   }, [inputValue, baseOptions])
+
 
   const commit = (opt: any) => {
     if (!opt) return
@@ -132,13 +236,14 @@ export function SearchBar({ neighborhoods, addNeighborhood }: SearchBarProps) {
           minHeight: 52,
           borderRadius: 18,
           border: `2px solid ${COLORS.dark_blue}`,
-          boxShadow: `0 4px 12px ${COLORS.blue}`,
+          boxShadow: `0 4px 12px ${practice ? COLORS.deep_red : COLORS.blue}`,
           padding: '0 16px',
           background: 'white',
         }}
       >
         <Search size={18} color={COLORS.dark_blue} />
         <input
+          ref={inputRef}
           value={inputValue}
           placeholder="Search neighborhoods…"
           onFocus={() => {

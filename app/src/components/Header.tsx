@@ -1,5 +1,6 @@
 import React from 'react';
 import { Infinity, Info } from 'lucide-react';
+import { COLORS } from '../constants';
 
 type HeaderProps = {
     showPracticeMode: () => void;
@@ -15,8 +16,8 @@ export function Header({ showPracticeMode, showInfoScreen, showHome, practice }:
         justifyContent: 'space-between',
         padding: '0.5rem 1.5rem',
         width: '100%',
-        background: '#191923 ',
-        borderBottom: '2px solid #0E79B2',
+        background: COLORS.dark_blue,
+        borderBottom: !practice ? `2px solid ${COLORS.blue}` : `2px solid ${COLORS.deep_red}`,
         boxSizing: 'border-box',
         height: '60px',
         boxShadow: `
@@ -72,7 +73,7 @@ export function Header({ showPracticeMode, showInfoScreen, showHome, practice }:
         fontFamily:
             '"Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
         fontWeight: 'bold',
-        color: '#7FB685',
+        color: COLORS.logo_color,
         margin: 0,
         cursor: 'pointer'
     }

@@ -51,11 +51,13 @@ _MANUAL_NEIGHBORHOOD_BORDERS_TO_ADD: list[list[str]] = [
     ['Bushwick', 'Glendale', 'The Evergreens Cemetery'], # All very close, practically border
     ['Bensonhurst', 'Dyker Beach Park'], # Close
     ['Oakland Gardens-Hollis Hills', 'Jamaica Estates-Holliswood'], # Close
-
+    #Note: Not removing Canarasie/Bergen border because mcguire fields is not really it's own neighborhood. 
 ]
 
 _MANUAL_NEIGHBORHOOD_BORDERS_TO_REMOVE: list[list[int]] = [
-    ['College Point', 'LaGuardia Airport']
+    ['College Point', 'LaGuardia Airport'],
+    ['Upper East Side-Lenox Hill-Roosevelt Island-Carnegie Hill-Yorkville', 'Midtown-Times Square'], # Borders are pretty clearly defined by the park
+    ['Upper West Side-Lincoln Square-Manhattan Valley', 'Midtown-Times Square'], # Borders are clearly defined by the park
 ]
 
 

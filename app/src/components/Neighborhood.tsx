@@ -84,8 +84,9 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick, debug =
                 transition: "opacity 150ms ease",
             }}
             onClick={() => onClick(neighborhood.name)}
+            //KBM Behavior
             onPointerEnter={(e) => {
-                if (e.pointerType === "touch") return; // optional, see note below
+                if (e.pointerType === "touch") return;
 
                 setHovered(true);
 
@@ -95,7 +96,7 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick, debug =
                 }
 
                 if (debug) onHover(neighborhood.borders);
-                else if (enabled) onHover(neighborhood.name, e.clientX, e.clientY);
+                else if (enabled && showName) onHover(neighborhood.name, e.clientX, e.clientY);
             }}
             onPointerLeave={(e) => {
                 if (e.pointerType === "touch") return;
@@ -103,25 +104,27 @@ export function Neighborhood({ neighborhood, onHover, offHover, onClick, debug =
                 setHovered(false);
 
                 if (debug) offHover(neighborhood.borders);
-                else if (enabled) offHover();
+                else if (enabled && showName) offHover();
             }}
+            // Mobile Behavior
             onPointerDown={(e) => {
                 if (e.pointerType === "touch") {
                     if (enabled) {
-                        setHovered(true);
+                        wiggle();
                         toolTipLock.current += 1
                         const my_tool_tip_lock = toolTipLock.current
                         if (debug) onHover(neighborhood.borders);
-                        else onHover(neighborhood.name, e.clientX, e.clientY);
-                        setTimeout(() => {
-                            if (my_tool_tip_lock == toolTipLock.current) {
-                                if (debug) offHover(neighborhood.borders);
-                                else {
-                                    offHover();
+                        else if (showName) {
+                            onHover(neighborhood.name, e.clientX, e.clientY);
+                            setTimeout(() => {
+                                if (my_tool_tip_lock == toolTipLock.current) {
+                                    if (debug) offHover(neighborhood.borders);
+                                    else {
+                                        offHover();
+                                    }
                                 }
-                            }
-                        }, 2000);
-                        setHovered(false);
+                            }, 2000);
+                        }
                     }
                 }
             }}

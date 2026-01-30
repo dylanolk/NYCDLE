@@ -125,7 +125,7 @@ function AppInner({ debug = false, practice = false }) {
     fetchNeighborhoods();
   }, []);
 
-  useEffect(() => { resetGame() }, [location.pathname])
+  useEffect(() => { resetGame(); console.log("YO!") }, [location.pathname])
 
   // Apply saved game state
   const savedGameStateApplied = useRef(false);
@@ -426,9 +426,9 @@ function AppInner({ debug = false, practice = false }) {
       <Header showInfoScreen={() => setShowInfoScreen(true)} showPracticeMode={() => { resetGame(); navigate('/practice') }} showHome={() => { navigate('/') }} practice={practice} />
       <div style={middle_div}>
         <ToolTip label={toolTipLabel} open={toolTipOpen} mousePos={cursorXY} />
-        <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} />
+        <GoalBox startNeighborhoodName={start_neighborhood_name} endNeighborhoodName={end_neighborhood_name} practice={practice} />
         <MapDisplay neighborhoods={neighborhoods} enabled_neighborhoods_ids={enabled_neighborhoods_ids} practice={practice} showPracticeSettings={() => setShowPracticeSettings(true)} onHover={handleHover} offHover={handleOffHover} />
-        {!gameState.finished ? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} wrapperRef={wrapperRef} /> : <ResultsButton showResults={() => setEndScreenVisible(true)} />}
+        {!gameState.finished ? <SearchBar neighborhoods={neighborhoods} addNeighborhood={addNeighborhood} practice={practice} /> : <ResultsButton showResults={() => setEndScreenVisible(true)} />}
         <EndScreen
           endScreenVisible={endScreenVisible}
           onClose={() => setEndScreenVisible(false)}
@@ -456,7 +456,7 @@ function AppInner({ debug = false, practice = false }) {
 
 }
 
-const COORDS_CACHE_KEY = 'coords_v3';
+const COORDS_CACHE_KEY = 'coords_v1.01';
 
 async function fetchData() {
 
