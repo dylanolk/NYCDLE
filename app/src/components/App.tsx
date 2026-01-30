@@ -86,11 +86,7 @@ function AppInner({ debug = false, practice = false }) {
   const [cursorXY, setCursorXY] = useState({ x: 0, y: 0 })
 
   function resetGame() {
-    Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(false))
-    Object.values(registry).forEach(neighborhood => neighborhood.setColor("lightgrey"))
-    Object.values(registry).forEach(neighborhood => neighborhood.setGreyedOut(false))
-    Object.values(registry).forEach(neighborhood => neighborhood.setShowName(false))
-
+    setAllDisabled();
     const state = practice ? _INITIAL_GAME_STATE : gameState
     if (practice) {
       setGameState(_INITIAL_GAME_STATE);
@@ -316,7 +312,8 @@ function AppInner({ debug = false, practice = false }) {
   function setAllDisabled() {
     Object.values(registry).forEach(neighborhood => neighborhood.setEnabled(false));
     Object.values(registry).forEach(neighborhood => neighborhood.setShowName(false));
-    Object.values(registry).forEach(neighborhood => neighborhood.setShowName('lightgrey'));
+    Object.values(registry).forEach(neighborhood => neighborhood.setColor('lightgrey'));
+    Object.values(registry).forEach(neighborhood => neighborhood.setGreyedOut(false));
   }
 
 
